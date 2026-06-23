@@ -68,7 +68,7 @@ export function MessageList({ messages, isTyping }: MessageListProps) {
                 {isUser ? "You" : "Nile"}
               </span>
               <span className={`text-xs ${isUser ? "text-primary-100" : "text-gray-500 dark:text-gray-400"}`}>
-                {formatTimestamp(message.timestamp!)}
+                {formatTimestamp(message.createdAt!)}
               </span>
             </div>
             
