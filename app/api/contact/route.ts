@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { storage } from "@/lib/storage";
+import { createContactMessage } from "@/lib/storage";
 import { insertContactMessageSchema } from "@/shared/schema";
 
 export async function POST(request: NextRequest) {
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const msg = await storage.createContactMessage(result.data);
+    const msg = await createContactMessage(result.data);
     return NextResponse.json(
       { success: true, message: "Message received successfully", data: msg },
       { status: 201 }

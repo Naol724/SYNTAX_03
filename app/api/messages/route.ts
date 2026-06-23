@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { storage } from "@/lib/storage";
+import { getContactMessages } from "@/lib/storage";
 
 export async function GET() {
   try {
-    const messages = await storage.getAllContactMessages();
+    const messages = await getContactMessages();
     return NextResponse.json({ success: true, data: messages });
   } catch (error) {
     console.error("Error fetching messages:", error);
