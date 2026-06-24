@@ -69,20 +69,6 @@ export function ServicesMarquee() {
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes marquee {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(calc(-400px * ${services.length} - 1.5rem * ${services.length}));
-          }
-        }
-
-        .animate-marquee {
-          animation: marquee 30s linear infinite;
-        }
-      `}</style>
     </div>
   );
 }
