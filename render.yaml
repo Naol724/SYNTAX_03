@@ -1,15 +1,30 @@
 services:
+
   - type: web
+
     name: syntax-software-solutions
+
     env: node
+
     region: oregon
+
     plan: free
+
     buildCommand: npm install && npm run build
+
     startCommand: npm start
+
     envVars:
+
       - key: NODE_ENV
+
         value: production
+
       - key: MONGODB_URI
+
         sync: false
+
       - key: OPENAI_API_KEY
+
         sync: false
+
