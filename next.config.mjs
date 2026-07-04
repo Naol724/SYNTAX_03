@@ -21,29 +21,8 @@ const nextConfig = {
   poweredByHeader: false,
   generateEtags: true,
   
-  // Fix webpack chunk loading issues
-  webpack: (config, { isServer }) => {
-    // Improve chunk splitting stability
-    if (!isServer) {
-      config.optimization = {
-        ...config.optimization,
-        runtimeChunk: 'single',
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            default: false,
-            vendors: false,
-            commons: {
-              name: 'commons',
-              chunks: 'all',
-              minChunks: 2,
-            },
-          },
-        },
-      };
-    }
-    return config;
-  },
+  // Turbopack configuration (empty config to silence warnings)
+  turbopack: {},
   
   // Improve build stability
   experimental: {
