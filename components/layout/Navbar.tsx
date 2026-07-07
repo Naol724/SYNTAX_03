@@ -360,6 +360,23 @@ export default function Navbar() {
 
               </motion.div>
 
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: (navLinks.length + 1) * 0.1 }}
+                className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700 mt-2"
+              >
+                <ThemeToggle />
+                <Link
+                  href="/admin/dashboard"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-500/10 text-orange-500 hover:bg-orange-500/20 font-semibold text-sm transition-all duration-300 border border-orange-500/20"
+                >
+                  <Settings className="w-4 h-4" />
+                  <span>Admin</span>
+                </Link>
+              </motion.div>
+
             </div>
 
           </motion.div>
