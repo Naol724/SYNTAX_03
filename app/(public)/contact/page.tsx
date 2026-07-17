@@ -80,7 +80,7 @@ const contactInfo = [
 
     value: "+251 945 455 141\n+251 940 023 840",
 
-    color: "bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400",
+    color: "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400",
 
   },
 
@@ -92,7 +92,7 @@ const contactInfo = [
 
     value: "syntaxsoftwaresolution@gmail.com",
 
-    color: "bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400",
+    color: "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300",
 
   },
 
@@ -104,7 +104,7 @@ const contactInfo = [
 
     value: "Mon–Fri: 8AM–6PM\nSat: 9AM–4PM\nSupport: 24/7",
 
-    color: "bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400",
+    color: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300",
 
   },
 
@@ -148,7 +148,7 @@ const socialLinks = [
 
     href: "https://instagram.com/syntax.software.solution",
 
-    color: "hover:bg-pink-600 hover:text-white",
+    color: "hover:bg-blue-600 hover:text-white",
 
   },
 
@@ -256,7 +256,7 @@ export default function Contact() {
 
       {/* Hero Section */}
 
-      <section className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white py-32 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white py-16 sm:py-24 md:py-32 overflow-hidden">
 
         {/* Background effects */}
 
@@ -294,7 +294,7 @@ export default function Contact() {
 
             animate={{ opacity: 1, y: 0 }}
 
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.2 }}
 
           >
 
@@ -304,13 +304,13 @@ export default function Contact() {
 
               animate={{ opacity: 1, scale: 1 }}
 
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.05 }}
 
               className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-5 py-2 mb-8 border border-white/10"
 
             >
 
-              <MessageSquare className="w-4 h-4 text-cyan-300" />
+              <MessageSquare className="w-4 h-4 text-blue-300" />
 
               <span className="text-sm font-medium">24-Hour Response Guaranteed</span>
 
@@ -324,9 +324,9 @@ export default function Contact() {
 
               animate={{ opacity: 1, y: 0 }}
 
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.08 }}
 
-              className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6"
+              className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 sm:mb-6"
 
             >
 
@@ -342,7 +342,7 @@ export default function Contact() {
 
               animate={{ opacity: 1, y: 0 }}
 
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.1 }}
 
               className="text-lg sm:text-xl text-blue-100/90 max-w-2xl mx-auto leading-relaxed"
 
@@ -362,11 +362,11 @@ export default function Contact() {
 
       {/* Contact Content */}
 
-      <section className="py-20 bg-gray-50 dark:bg-gray-900">
+      <section className="py-12 sm:py-16 md:py-20 bg-gray-50 dark:bg-gray-900">
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          <div className="grid lg:grid-cols-5 gap-12">
+          <div className="grid lg:grid-cols-5 gap-6 sm:gap-8 md:gap-12">
 
             {/* Left: Contact Info */}
 
@@ -402,7 +402,7 @@ export default function Contact() {
 
               {/* Contact details */}
 
-              <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-1 lg:gap-4">
 
                 {contactInfo.map((item, index) => (
 
@@ -418,11 +418,11 @@ export default function Contact() {
 
                     transition={{ delay: index * 0.1 }}
 
-                    className="flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-700 hover:shadow-md transition-all duration-200"
+                    className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-700 hover:shadow-md transition-all duration-200"
 
                   >
 
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${item.color}`}>
+                    <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 ${item.color}`}>
 
                       {item.icon}
 
@@ -436,7 +436,7 @@ export default function Contact() {
 
                       </p>
 
-                      <p className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-line leading-relaxed">
+                      <p className="text-[10px] sm:text-xs md:text-sm text-gray-800 dark:text-gray-200 whitespace-pre-line leading-snug sm:leading-relaxed">
 
                         {item.value}
 
@@ -528,9 +528,9 @@ export default function Contact() {
 
                 {/* Form Header */}
 
-                <div className="px-8 pt-8 pb-6 border-b border-gray-100 dark:border-gray-700">
+                <div className="px-4 sm:px-6 md:px-8 pt-5 sm:pt-6 md:pt-8 pb-4 sm:pb-5 md:pb-6 border-b border-gray-100 dark:border-gray-700">
 
-                  <h2 className="text-xl font-black text-gray-900 dark:text-white">
+                  <h2 className="text-base sm:text-lg md:text-xl font-black text-gray-900 dark:text-white">
 
                     Send Us a Message
 
@@ -548,7 +548,7 @@ export default function Contact() {
 
                 {/* Form Content */}
 
-                <div className="p-8">
+                <div className="p-4 sm:p-6 md:p-8">
 
                   <AnimatePresence mode="wait">
 
@@ -576,11 +576,11 @@ export default function Contact() {
 
                           transition={{ type: "spring", stiffness: 200, damping: 15 }}
 
-                          className="w-24 h-24 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-200/50 dark:shadow-green-900/20"
+                          className="w-24 h-24 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-200/50 dark:shadow-blue-900/20"
 
                         >
 
-                          <CheckCircle className="w-12 h-12 text-green-600 dark:text-green-400" />
+                          <CheckCircle className="w-12 h-12 text-blue-600 dark:text-blue-400" />
 
                         </motion.div>
 
@@ -1092,7 +1092,7 @@ export default function Contact() {
 
             viewport={{ once: true }}
 
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.05 }}
 
             className="relative bg-gray-100 dark:bg-gray-800 rounded-3xl overflow-hidden h-[500px] shadow-2xl"
 
@@ -1130,7 +1130,7 @@ export default function Contact() {
 
       {/* FAQ Quick Links */}
 
-      <section className="py-20 bg-gray-50 dark:bg-gray-900">
+      <section className="py-12 sm:py-16 md:py-20 bg-gray-50 dark:bg-gray-900">
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -1234,7 +1234,7 @@ export default function Contact() {
 
       {/* Newsletter */}
 
-      <section className="py-20 bg-white dark:bg-gray-950">
+      <section className="py-20 bg-transparent">
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 

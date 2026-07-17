@@ -32,20 +32,20 @@ export function TechLogos() {
   const duplicatedTechs = [...technologies, ...technologies];
 
   return (
-    <section className="relative py-24 glass-section-medium overflow-hidden">
+    <section className="relative py-12 sm:py-16 md:py-24 glass-section-medium overflow-hidden">
       {/* Animated Background Pattern */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(59,130,246,0.08),transparent_50%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(99,102,241,0.08),transparent_50%)]" />
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-sm font-bold tracking-wide mb-6">
+        <div className="text-center mb-8 sm:mb-12 md:mb-16">
+          <span className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs sm:text-sm font-bold tracking-wide mb-4 sm:mb-6">
             Technology Stack
           </span>
-          <h2 className="text-5xl sm:text-6xl font-black text-gray-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 dark:text-white mb-3 sm:mb-4">
             Powered By The Best
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          <p className="text-sm sm:text-base md:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto px-2">
             We use cutting-edge technologies to build scalable, secure, and high-performance solutions
           </p>
         </div>
@@ -60,10 +60,10 @@ export function TechLogos() {
             {duplicatedTechs.map((tech, index) => (
               <div
                 key={`${tech.name}-${index}`}
-                className="group relative glass-card-premium flex-shrink-0 w-32 h-32 flex flex-col items-center justify-center gap-3 overflow-hidden hover:scale-105 transition-transform duration-300"
+                className="group relative glass-card-premium flex-shrink-0 w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 flex flex-col items-center justify-center gap-2 sm:gap-3 overflow-hidden hover:scale-105 transition-transform duration-300"
               >
                 {/* Gradient Glow on Hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-blue-500/10 group-hover:via-purple-500/10 group-hover:to-pink-500/10 transition-all duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-indigo-500/0 to-blue-600/0 group-hover:from-blue-500/10 group-hover:via-indigo-500/10 group-hover:to-blue-600/10 transition-all duration-700" />
                 
                 {/* Logo - Smaller size */}
                 <div className="relative w-10 h-10 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">

@@ -161,15 +161,15 @@ const projects = [
 ];
 
 const colorMap: Record<string, { badge: string; tech: string; border: string }> = {
-  red:    { badge: "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300",   tech: "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300",   border: "hover:border-red-300 dark:hover:border-red-600" },
-  green:  { badge: "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300", tech: "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300", border: "hover:border-green-300 dark:hover:border-green-600" },
+  red:    { badge: "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300", tech: "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300", border: "hover:border-blue-300 dark:hover:border-blue-600" },
+  green:  { badge: "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300", tech: "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300", border: "hover:border-blue-300 dark:hover:border-blue-600" },
   indigo: { badge: "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300", tech: "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300", border: "hover:border-indigo-300 dark:hover:border-indigo-600" },
   slate:  { badge: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300", tech: "bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300", border: "hover:border-slate-300 dark:hover:border-slate-600" },
-  orange: { badge: "bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300", tech: "bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300", border: "hover:border-orange-300 dark:hover:border-orange-600" },
-  yellow: { badge: "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300", tech: "bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300", border: "hover:border-yellow-300 dark:hover:border-yellow-600" },
-  purple: { badge: "bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300", tech: "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300", border: "hover:border-purple-300 dark:hover:border-purple-600" },
-  pink:   { badge: "bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-300", tech: "bg-pink-50 dark:bg-pink-900/20 text-pink-700 dark:text-pink-300", border: "hover:border-pink-300 dark:hover:border-pink-600" },
-  cyan:   { badge: "bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300", tech: "bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300", border: "hover:border-cyan-300 dark:hover:border-cyan-600" },
+  orange: { badge: "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300", tech: "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300", border: "hover:border-indigo-300 dark:hover:border-indigo-600" },
+  yellow: { badge: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300", tech: "bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300", border: "hover:border-slate-300 dark:hover:border-slate-600" },
+  purple: { badge: "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300", tech: "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300", border: "hover:border-indigo-300 dark:hover:border-indigo-600" },
+  pink:   { badge: "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300", tech: "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300", border: "hover:border-blue-300 dark:hover:border-blue-600" },
+  cyan:   { badge: "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300", tech: "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300", border: "hover:border-blue-300 dark:hover:border-blue-600" },
   blue:   { badge: "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300", tech: "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300", border: "hover:border-blue-300 dark:hover:border-blue-600" },
 };
 
@@ -199,12 +199,12 @@ export default function Projects() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.2 }}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.05 }}
               className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-5 py-2 mb-8 border border-white/10"
             >
               <Layers className="w-4 h-4 text-blue-300" />
@@ -214,7 +214,7 @@ export default function Projects() {
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.08 }}
               className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6"
             >
               Our Projects
@@ -223,7 +223,7 @@ export default function Projects() {
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.1 }}
               className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed"
             >
               Real products, real clients — across healthcare, e-commerce, gaming, enterprise, and more. All live and running.
@@ -238,7 +238,7 @@ export default function Projects() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.05 }}
             className="flex flex-wrap items-center justify-center gap-3"
           >
             <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mr-2">
@@ -265,7 +265,7 @@ export default function Projects() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.1 }}
             className="text-center mt-3 text-sm text-gray-400"
           >
             Showing <span className="font-bold text-gray-700 dark:text-gray-300">{filtered.length}</span> project{filtered.length !== 1 ? "s" : ""}
@@ -275,7 +275,7 @@ export default function Projects() {
       </section>
 
       {/* Projects Grid */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-900 flex-1">
+      <section className="py-16 bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-sm flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             layout
@@ -324,7 +324,7 @@ export default function Projects() {
                       {/* Status badge */}
                       <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
                         <div className="flex items-center gap-2">
-                          <span className={`w-2 h-2 rounded-full ${project.status === 'Live' ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                          <span className={`w-2 h-2 rounded-full ${project.status === 'Live' ? 'bg-blue-500' : 'bg-slate-400'}`} />
                           <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{project.status}</span>
                         </div>
 

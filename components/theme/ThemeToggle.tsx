@@ -16,23 +16,23 @@ export function ThemeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="text-white hover:bg-orange-500/20">
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-orange-400" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-orange-400" />
+        <Button variant="ghost" size="icon" className="text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 h-9 w-9">
+          <Sun className="h-[1.1rem] w-[1.1rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-blue-500" />
+          <Moon className="absolute h-[1.1rem] w-[1.1rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-blue-400" />
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-slate-900 border-orange-500/30">
-        <DropdownMenuItem onClick={() => setTheme("light")} className="text-gray-300 hover:text-orange-400 hover:bg-orange-500/10 cursor-pointer">
-          <Sun className="mr-2 h-4 w-4 text-orange-400" />
+      <DropdownMenuContent align="end" className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-orange-500/30">
+        <DropdownMenuItem onClick={() => setTheme("light")} className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-blue-500/10 cursor-pointer">
+          <Sun className="mr-2 h-4 w-4 text-blue-500" />
           <span>Light</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")} className="text-gray-300 hover:text-orange-400 hover:bg-orange-500/10 cursor-pointer">
-          <Moon className="mr-2 h-4 w-4 text-orange-400" />
+        <DropdownMenuItem onClick={() => setTheme("dark")} className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-blue-500/10 cursor-pointer">
+          <Moon className="mr-2 h-4 w-4 text-blue-400" />
           <span>Dark</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")} className="text-gray-300 hover:text-orange-400 hover:bg-orange-500/10 cursor-pointer">
-          <Monitor className="mr-2 h-4 w-4 text-orange-400" />
+        <DropdownMenuItem onClick={() => setTheme("system")} className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-blue-500/10 cursor-pointer">
+          <Monitor className="mr-2 h-4 w-4 text-gray-500" />
           <span>System</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

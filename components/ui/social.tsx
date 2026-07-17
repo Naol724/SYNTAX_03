@@ -1,58 +1,48 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Github, Linkedin, Facebook, Instagram, Twitter, Send, Globe } from 'lucide-react';
+import { Github, Linkedin, Facebook, Instagram, Twitter, Send } from 'lucide-react';
 
 interface SocialLink {
   icon: React.ReactNode;
   href: string;
   label: string;
-  color: string;
-  hoverColor: string;
 }
+
+/** Shared brand styling for all social icons — blue / slate only */
+const socialBase =
+  'bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-blue-300 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white';
 
 const socialLinks: SocialLink[] = [
   {
     icon: <Github className="w-5 h-5" />,
     href: 'https://github.com/SYTAXSOFTWARESOLUTIONS',
     label: 'GitHub',
-    color: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300',
-    hoverColor: 'hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900',
   },
   {
     icon: <Linkedin className="w-5 h-5" />,
     href: 'https://linkedin.com/company/syntax-software-solutions',
     label: 'LinkedIn',
-    color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
-    hoverColor: 'hover:bg-blue-600 hover:text-white',
   },
   {
     icon: <Facebook className="w-5 h-5" />,
     href: 'https://facebook.com/syntaxsoftware',
     label: 'Facebook',
-    color: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400',
-    hoverColor: 'hover:bg-indigo-600 hover:text-white',
   },
   {
     icon: <Instagram className="w-5 h-5" />,
     href: 'https://instagram.com/syntax.software.solution',
     label: 'Instagram',
-    color: 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400',
-    hoverColor: 'hover:bg-pink-600 hover:text-white',
   },
   {
     icon: <Twitter className="w-5 h-5" />,
     href: 'https://twitter.com/syntaxsoftware',
     label: 'X (Twitter)',
-    color: 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-400',
-    hoverColor: 'hover:bg-sky-600 hover:text-white',
   },
   {
     icon: <Send className="w-5 h-5" />,
     href: 'https://t.me/syntaxsoftware',
     label: 'Telegram',
-    color: 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400',
-    hoverColor: 'hover:bg-cyan-600 hover:text-white',
   },
 ];
 
@@ -81,7 +71,7 @@ export function SocialIcons({
   className = '',
   variant = 'default',
 }: SocialIconsProps) {
-  const { icon: iconSize, container: containerSize } = sizeClasses[size];
+  const { container: containerSize } = sizeClasses[size];
   const roundedClass = variantClasses[variant];
 
   return (
@@ -93,12 +83,13 @@ export function SocialIcons({
           target="_blank"
           rel="noopener noreferrer"
           aria-label={social.label}
+          title={showLabels ? social.label : undefined}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: index * 0.1 }}
           whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95 }}
-          className={`inline-flex items-center justify-center ${containerSize} ${roundedClass} ${social.color} ${social.hoverColor} transition-all duration-300`}
+          className={`inline-flex items-center justify-center ${containerSize} ${roundedClass} ${socialBase} transition-all duration-300`}
         >
           {social.icon}
         </motion.a>
@@ -107,7 +98,6 @@ export function SocialIcons({
   );
 }
 
-// Compact social bar for footer
 export function SocialBar({ className = '' }: { className?: string }) {
   return (
     <motion.div
@@ -115,7 +105,7 @@ export function SocialBar({ className = '' }: { className?: string }) {
       animate={{ opacity: 1 }}
       className={`flex items-center gap-2 ${className}`}
     >
-      {socialLinks.map((social, index) => (
+      {socialLinks.map((social) => (
         <motion.a
           key={social.label}
           href={social.href}
@@ -124,7 +114,7 @@ export function SocialBar({ className = '' }: { className?: string }) {
           aria-label={social.label}
           whileHover={{ scale: 1.1, y: -1 }}
           whileTap={{ scale: 0.95 }}
-          className={`w-9 h-9 inline-flex items-center justify-center rounded-lg ${social.color} ${social.hoverColor} transition-all duration-200`}
+          className={`w-9 h-9 inline-flex items-center justify-center rounded-lg ${socialBase} transition-all duration-200`}
         >
           {social.icon}
         </motion.a>
@@ -133,7 +123,6 @@ export function SocialBar({ className = '' }: { className?: string }) {
   );
 }
 
-// Social proof section
 interface SocialProofProps {
   logos?: Array<{ name: string; icon?: React.ReactNode }>;
   text?: string;
@@ -141,25 +130,24 @@ interface SocialProofProps {
 
 export function SocialProof({ logos, text = 'Trusted by companies worldwide' }: SocialProofProps) {
   return (
-    <div className="py-8 border-y border-gray-100 dark:border-gray-800">
+    <div className="py-8 border-y border-slate-100 dark:border-slate-800">
       <motion.p
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
-        className="text-center text-sm text-gray-500 dark:text-gray-400 mb-6"
+        className="text-center text-sm text-slate-500 dark:text-slate-400 mb-6"
       >
         {text}
       </motion.p>
       <div className="flex flex-wrap justify-center items-center gap-8 opacity-60">
-        {/* Company logos as placeholders */}
         {['Google', 'Microsoft', 'Amazon', 'Meta', 'Apple', 'Netflix'].map((company, index) => (
           <motion.span
             key={company}
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: index * 0.1 }}
-            className="text-lg font-bold text-gray-400 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
+            transition={{ delay: index * 0.05 }}
+            className="text-sm font-semibold text-slate-500 dark:text-slate-400"
           >
             {company}
           </motion.span>

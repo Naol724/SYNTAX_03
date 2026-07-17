@@ -38,8 +38,8 @@ const services = [
     description: "Deliver seamless user experiences on iOS and Android with React Native. We build apps that engage users and drive business growth.",
     features: ["React Native Development", "iOS & Android", "Push Notifications", "Offline Support", "App Store Deployment", "UI/UX Design"],
     color: "violet",
-    gradient: "from-violet-500 to-purple-600",
-    iconBg: "bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400",
+    gradient: "from-blue-600 to-indigo-600",
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400",
   },
   {
     id: "gaming",
@@ -49,8 +49,8 @@ const services = [
     description: "Custom bingo callers, lottery systems, and interactive gaming platforms with real-time capabilities and admin dashboards.",
     features: ["Real-Time Systems", "Admin Dashboards", "Payment Integration", "Multi-Player Support", "Live Scoring", "Analytics"],
     color: "green",
-    gradient: "from-green-500 to-emerald-600",
-    iconBg: "bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400",
+    gradient: "from-indigo-500 to-blue-600",
+    iconBg: "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400",
   },
   {
     id: "enterprise",
@@ -60,8 +60,8 @@ const services = [
     description: "Streamline your operations with custom software including POS, inventory management, HR systems, and comprehensive ERP solutions.",
     features: ["Restaurant POS", "Inventory Control", "Rental Management", "Debt Tracking", "HR Systems", "ERP Integration"],
     color: "orange",
-    gradient: "from-orange-500 to-amber-600",
-    iconBg: "bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400",
+    gradient: "from-blue-700 to-indigo-700",
+    iconBg: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300",
   },
   {
     id: "bots",
@@ -71,8 +71,8 @@ const services = [
     description: "Automate customer service, orders, and internal workflows with intelligent Telegram bots and AI-powered chatbots.",
     features: ["Telegram Bots", "AI Chatbots", "Order Automation", "Customer Support", "Payment Integration", "Analytics"],
     color: "cyan",
-    gradient: "from-cyan-500 to-blue-600",
-    iconBg: "bg-cyan-100 dark:bg-cyan-900/40 text-cyan-600 dark:text-cyan-400",
+    gradient: "from-blue-500 to-indigo-500",
+    iconBg: "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300",
   },
   {
     id: "design",
@@ -82,8 +82,8 @@ const services = [
     description: "Create interfaces people love to use. From research and wireframes to high-fidelity prototypes and design systems.",
     features: ["User Research", "Wireframing", "Prototyping", "Design Systems", "Mobile Design", "Web Design"],
     color: "pink",
-    gradient: "from-pink-500 to-rose-600",
-    iconBg: "bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400",
+    gradient: "from-indigo-600 to-blue-700",
+    iconBg: "bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300",
   },
   {
     id: "cloud",
@@ -93,7 +93,7 @@ const services = [
     description: "Build reliable, scalable applications with modern cloud infrastructure, CI/CD pipelines, and deployment automation.",
     features: ["AWS & Firebase", "Docker", "CI/CD Pipelines", "24/7 Monitoring", "Security Updates", "Performance Optimization"],
     color: "indigo",
-    gradient: "from-indigo-500 to-violet-600",
+    gradient: "from-indigo-500 to-blue-600",
     iconBg: "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400",
   },
   {
@@ -104,8 +104,8 @@ const services = [
     description: "Keep your software running smoothly with 24/7 support, security updates, performance monitoring, and continuous improvements.",
     features: ["24/7 Support", "Security Audits", "Performance Tuning", "Feature Updates", "Bug Fixes", "Monitoring"],
     color: "red",
-    gradient: "from-red-500 to-orange-600",
-    iconBg: "bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400",
+    gradient: "from-slate-600 to-blue-700",
+    iconBg: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300",
   },
 ];
 
@@ -136,7 +136,7 @@ export default function Services() {
         <motion.div
           initial={{ scale: 1.05, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1.2 }}
+          transition={{ duration: 0.2 }}
           className="absolute inset-0 z-0"
         >
           <div
@@ -160,12 +160,12 @@ export default function Services() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.2 }}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.05 }}
               className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-5 py-2 mb-8 border border-white/10"
             >
               <Zap className="w-4 h-4 text-yellow-300" />
@@ -175,7 +175,7 @@ export default function Services() {
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.08 }}
               className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6"
             >
               Our Services
@@ -184,7 +184,7 @@ export default function Services() {
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.1 }}
               className="text-lg sm:text-xl text-blue-100/90 max-w-3xl mx-auto leading-relaxed"
             >
               Full product lifecycle — from discovery and design through development, deployment, and long-term support. Building digital products that drive business growth.
@@ -260,7 +260,7 @@ export default function Services() {
                         transition={{ delay: i * 0.05 }}
                         className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300"
                       >
-                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                        <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0" />
                         <span className="font-medium">{feature}</span>
                       </motion.div>
                     ))}
@@ -304,7 +304,7 @@ export default function Services() {
             </p>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 md:gap-8">
             {process.map((step, index) => (
               <motion.div
                 key={step.step}
@@ -314,18 +314,16 @@ export default function Services() {
                 transition={{ delay: index * 0.15 }}
                 className="text-center"
               >
-                {/* Step number */}
-                <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-black text-xl shadow-xl shadow-blue-500/25 mb-6 z-10">
+                <div className="relative inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-black text-sm sm:text-base md:text-lg lg:text-xl shadow-lg sm:shadow-xl shadow-blue-500/25 mb-2 sm:mb-4 md:mb-6 z-10">
                   {step.step}
                 </div>
 
-                {/* Connector */}
                 {index < process.length - 1 && (
                   <div className="hidden lg:block absolute top-8 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-blue-200 to-indigo-200 dark:from-blue-800 dark:to-indigo-800" />
                 )}
 
-                <h4 className="font-bold text-gray-900 dark:text-white text-lg mb-2">{step.title}</h4>
-                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{step.desc}</p>
+                <h4 className="font-bold text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg mb-1 sm:mb-2">{step.title}</h4>
+                <p className="text-[10px] sm:text-xs md:text-sm text-gray-500 dark:text-gray-400 leading-snug sm:leading-relaxed px-1">{step.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -372,7 +370,7 @@ export default function Services() {
       </section>
 
       {/* Testimonials Preview */}
-      <section className="py-24 bg-gray-50 dark:bg-gray-900">
+      <section className="py-24 bg-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -396,7 +394,7 @@ export default function Services() {
       <FAQSection />
 
       {/* Newsletter */}
-      <section className="py-24 bg-gray-50 dark:bg-gray-900">
+      <section className="py-24 bg-transparent">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Newsletter
             title="Tech Insights Delivered"

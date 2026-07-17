@@ -45,7 +45,7 @@ const teamMembers: TeamMember[] = [
     role: 'Senior Developer',
     bio: 'Full-stack expert in scalable web & enterprise platforms. Specializes in React, Node.js, and cloud architecture.',
     initials: 'TS',
-    gradient: 'from-violet-500 to-violet-700',
+    gradient: 'from-blue-600 to-indigo-600',
     linkedin: 'https://linkedin.com/in/tsega',
   },
   {
@@ -53,7 +53,7 @@ const teamMembers: TeamMember[] = [
     role: 'Senior Developer',
     bio: 'Backend architect focused on API design & high-performance systems. PostgreSQL and microservices specialist.',
     initials: 'NA',
-    gradient: 'from-cyan-500 to-cyan-700',
+    gradient: 'from-indigo-500 to-blue-700',
     github: 'https://github.com/nati',
   },
   {
@@ -61,7 +61,7 @@ const teamMembers: TeamMember[] = [
     role: 'Cybersecurity Specialist',
     bio: 'Penetration testing, data protection & security audits. Certified security professional protecting client assets.',
     initials: 'KI',
-    gradient: 'from-red-500 to-red-700',
+    gradient: 'from-slate-600 to-blue-800',
     linkedin: 'https://linkedin.com/in/kiya',
   },
 ];
@@ -146,7 +146,7 @@ export function TeamGrid({ columns = 5, showFullTeam = true }: TeamGridProps) {
                   href={member.email}
                   whileHover={{ scale: 1.1, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400 hover:bg-green-600 hover:text-white transition-colors"
+                  className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white transition-colors"
                 >
                   <Mail className="w-4 h-4" />
                 </motion.a>

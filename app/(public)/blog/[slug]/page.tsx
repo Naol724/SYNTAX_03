@@ -1,4 +1,4 @@
-import { connectToDatabase } from "@/lib/mongodb"
+import { connectToDatabase } from "@/lib/mongoose"
 import { BlogPost, Comment } from "@/lib/models"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -12,33 +12,35 @@ import { Calendar, User, Share2, Facebook, Twitter, Linkedin, ArrowLeft, Clock }
 import { notFound } from "next/navigation"
 
 async function getBlogPost(slug: string) {
-  await connectToDatabase()
+  try {
+    await connectToDatabase()
 
-  const post = await BlogPost.findOne({ slug, published: true })
-  if (!post) return null
+    const post = await BlogPost.findOne({ slug, published: true })
+    if (!post) return null
 
-  // Increment views
-  await BlogPost.findByIdAndUpdate(post._id, { $inc: { views: 1 } })
+    await BlogPost.findByIdAndUpdate(post._id, { $inc: { views: 1 } })
 
-  // Get related posts
-  const relatedPosts = await BlogPost.find({
-    _id: { $ne: post._id },
-    published: true,
-    $or: [
-      { category: post.category },
-      { tags: { $in: post.tags } },
-    ],
-  })
-    .limit(4)
-    .sort({ createdAt: -1 })
+    const relatedPosts = await BlogPost.find({
+      _id: { $ne: post._id },
+      published: true,
+      $or: [
+        { category: post.category },
+        { tags: { $in: post.tags } },
+      ],
+    })
+      .limit(4)
+      .sort({ createdAt: -1 })
 
-  // Get comments
-  const comments = await Comment.find({
-    postId: post._id,
-    approved: true,
-  }).sort({ createdAt: -1 })
+    const comments = await Comment.find({
+      postId: post._id,
+      approved: true,
+    }).sort({ createdAt: -1 })
 
-  return { post, relatedPosts, comments }
+    return { post, relatedPosts, comments }
+  } catch (error) {
+    console.error("Failed to load blog post:", error)
+    return null
+  }
 }
 
 export default async function BlogPostPage({
@@ -55,7 +57,7 @@ export default async function BlogPostPage({
   const { post, relatedPosts, comments } = data
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-20">
+    <div className="min-h-screen bg-transparent py-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Button */}
         <Button variant="ghost" asChild className="mb-6">

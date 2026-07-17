@@ -4,8 +4,20 @@ dist
 .DS_Store
 server/public
 *.tar.gz
+
+# Secrets / env (never commit real credentials)
+.env
+.env.*
+!.env.example
 .env.local
 .env*.local
+.env.production
+.env.development
+*.pem
+*.p12
+*.key
+credentials.json
+service-account*.json
 
 # Build files
 tsconfig.tsbuildinfo
@@ -27,6 +39,7 @@ Thumbs.db
 *.swp
 *.swo
 
-# Temporary
+# Temporary / deploy caches
 .temp
 .cache
+.vercel

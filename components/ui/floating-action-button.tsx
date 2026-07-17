@@ -55,7 +55,7 @@ export function FloatingActionButton() {
                 href="tel:+251945455141"
                 className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-800 rounded-full shadow-xl border border-gray-200 dark:border-gray-700 hover:shadow-2xl transition-all group"
               >
-                <Phone className="w-5 h-5 text-green-600 dark:text-green-400" />
+                <Phone className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 pr-2">
                   Call Now
                 </span>

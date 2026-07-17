@@ -21,9 +21,6 @@ const nextConfig = {
   poweredByHeader: false,
   generateEtags: true,
   
-  // Turbopack configuration (empty config to silence warnings)
-  turbopack: {},
-  
   // Improve build stability
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],

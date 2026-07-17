@@ -1,10 +1,22 @@
 import { withAuth } from "next-auth/middleware"
+import { NextResponse } from "next/server"
 
-export default withAuth({
-  pages: {
-    signIn: "/admin/login",
+/**
+ * Protect /admin routes. Missing NEXTAUTH_SECRET must not crash the whole site.
+ */
+export default withAuth(
+  function middleware() {
+    return NextResponse.next()
   },
-})
+  {
+    pages: {
+      signIn: "/admin/login",
+    },
+    callbacks: {
+      authorized: ({ token }) => !!token,
+    },
+  }
+)
 
 export const config = {
   matcher: ["/admin", "/admin/((?!login).*)"],

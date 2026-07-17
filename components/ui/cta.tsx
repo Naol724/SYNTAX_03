@@ -109,14 +109,16 @@ export function CTA({
   );
 }
 
-// Contact CTA with phone/email
+// Contact CTA — professional brand block that fits light & dark mode
 export function ContactCTA() {
   return (
-    <section className="relative py-20 bg-gradient-to-r from-blue-700 to-indigo-800 text-white overflow-hidden">
-      {/* Background pattern */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-400 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+    <section className="relative py-12 sm:py-16 md:py-20 overflow-hidden border-t border-blue-700/20 bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 text-white">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-20"
+      >
+        <div className="absolute -top-24 -left-16 w-72 h-72 rounded-full bg-white blur-3xl" />
+        <div className="absolute -bottom-24 -right-16 w-80 h-80 rounded-full bg-indigo-300 blur-3xl" />
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -125,53 +127,53 @@ export function ContactCTA() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-3xl sm:text-4xl font-black mb-5">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 sm:mb-5 tracking-tight">
             Ready to Start Your Project?
           </h2>
-          <p className="text-blue-100/90 text-lg mb-10 max-w-2xl mx-auto">
-            Let's build something great together. Contact us today and we'll respond within 24 hours.
+          <p className="text-blue-100 text-sm sm:text-base md:text-lg mb-6 sm:mb-8 md:mb-10 max-w-2xl mx-auto px-2 leading-relaxed">
+            Let&apos;s build something great together. Contact us today and we&apos;ll respond within 24 hours.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 mb-10">
+          <div className="grid grid-cols-2 gap-2 sm:gap-4 max-w-md sm:max-w-none mx-auto mb-6 sm:mb-8 md:mb-10">
             <motion.a
               href="tel:+251945455141"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
-              className="flex items-center gap-3 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 transition-colors text-xs sm:text-sm"
             >
-              <Phone className="w-5 h-5" />
-              <span className="font-medium">+251 945 455 141</span>
+              <Phone className="w-4 h-4 flex-shrink-0" />
+              <span className="font-medium truncate">+251 945 455 141</span>
             </motion.a>
 
             <motion.a
               href="mailto:syntaxsoftwaresolution@gmail.com"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
-              className="flex items-center gap-3 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 transition-colors text-xs sm:text-sm"
             >
-              <Mail className="w-5 h-5" />
+              <Mail className="w-4 h-4 flex-shrink-0" />
               <span className="font-medium">Email Us</span>
             </motion.a>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4">
+          <div className="grid grid-cols-2 gap-2 sm:gap-4 max-w-md sm:max-w-none mx-auto">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-white text-blue-700 font-semibold text-sm hover:bg-blue-50 shadow-lg transition-all"
+                className="inline-flex items-center justify-center gap-1.5 sm:gap-2 w-full px-4 py-2.5 sm:px-8 sm:py-3.5 rounded-lg sm:rounded-xl bg-white text-blue-800 font-semibold text-xs sm:text-sm hover:bg-blue-50 shadow-lg transition-all"
               >
                 Get in Touch
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </Link>
             </motion.div>
 
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
               <Link
                 href="/services"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl border border-white/30 text-white font-semibold text-sm hover:bg-white/10 transition-all"
+                className="inline-flex items-center justify-center gap-1.5 sm:gap-2 w-full px-4 py-2.5 sm:px-6 sm:py-3.5 rounded-lg sm:rounded-xl border border-white/35 bg-white/10 text-white font-semibold text-xs sm:text-sm hover:bg-white/20 transition-all"
               >
                 View Services
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </Link>
             </motion.div>
           </div>

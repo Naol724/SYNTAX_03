@@ -5,6 +5,10 @@ import { PageLoader } from "@/components/ui/page-loader"
 import { AnimatedBackground } from "@/components/ui/animated-background"
 import ChatWidget from "@/components/ai/ChatWidget"
 
+/**
+ * Public pages share one Navbar + one Footer.
+ * Footer is transparent glass (no photo) and identical on every page.
+ */
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
@@ -14,12 +18,10 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <ChatWidget />
       <div className="relative min-h-screen flex flex-col">
         <Navbar />
-        <main className="flex-1 relative z-10">
+        <main className="flex-1 relative z-10 pb-16 sm:pb-0">
           {children}
         </main>
-        <div className="relative z-20">
-          <Footer />
-        </div>
+        <Footer />
       </div>
     </>
   )

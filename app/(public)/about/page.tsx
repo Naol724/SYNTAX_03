@@ -40,13 +40,13 @@ const timeline = [
 
   { year: "2020", event: "First Gaming Platform — Launched the offline bingo caller system.", dot: "bg-indigo-500" },
 
-  { year: "2021", event: "Expansion — Expanded into web development and enterprise solutions.", dot: "bg-violet-500" },
+  { year: "2021", event: "Expansion — Expanded into web development and enterprise solutions.", dot: "bg-blue-600" },
 
-  { year: "2022", event: "Recognition — Became a leading software company in Ethiopia.", dot: "bg-purple-500" },
+  { year: "2022", event: "Recognition — Became a leading software company in Ethiopia.", dot: "bg-indigo-600" },
 
   { year: "2023", event: "AI & Bots — Launched Telegram bots and AI-powered solutions.", dot: "bg-blue-600" },
 
-  { year: "2024", event: "Global Reach — Now serving clients worldwide while rooted in Ethiopia.", dot: "bg-green-500" },
+  { year: "2024", event: "Global Reach — Now serving clients worldwide while rooted in Ethiopia.", dot: "bg-indigo-700" },
 
 ];
 
@@ -76,7 +76,7 @@ const values = [
 
     desc: "Rigorous testing and quality assurance on every project we deliver.",
 
-    color: "bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400"
+    color: "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400"
 
   },
 
@@ -88,7 +88,7 @@ const values = [
 
     desc: "On-time delivery without compromising on quality or attention to detail.",
 
-    color: "bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400"
+    color: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
 
   },
 
@@ -100,7 +100,7 @@ const values = [
 
     desc: "We love what we do and it shows in every product we build.",
 
-    color: "bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400"
+    color: "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300"
 
   },
 
@@ -154,7 +154,7 @@ export default function About() {
 
           animate={{ scale: 1, opacity: 1 }}
 
-          transition={{ duration: 1.2 }}
+          transition={{ duration: 0.2 }}
 
           className="absolute inset-0 z-0"
 
@@ -202,7 +202,7 @@ export default function About() {
 
             animate={{ opacity: 1, y: 0 }}
 
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.2 }}
 
           >
 
@@ -212,13 +212,13 @@ export default function About() {
 
               animate={{ opacity: 1, scale: 1 }}
 
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.05 }}
 
               className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-5 py-2 mb-8 border border-white/10"
 
             >
 
-              <MapPin className="w-4 h-4 text-cyan-400" />
+              <MapPin className="w-4 h-4 text-blue-400" />
 
               <span className="text-sm font-medium">Bole Dembel, Addis Ababa • Est. 2019</span>
 
@@ -232,7 +232,7 @@ export default function About() {
 
               animate={{ opacity: 1, y: 0 }}
 
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.08 }}
 
               className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6 leading-tight"
 
@@ -256,7 +256,7 @@ export default function About() {
 
               animate={{ opacity: 1, y: 0 }}
 
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.1 }}
 
               className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed"
 
@@ -290,7 +290,7 @@ export default function About() {
 
               viewport={{ once: true }}
 
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.2 }}
 
             >
 
@@ -338,7 +338,7 @@ export default function About() {
 
                 viewport={{ once: true }}
 
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.08 }}
 
                 className="mt-8"
 
@@ -364,7 +364,7 @@ export default function About() {
 
               viewport={{ once: true }}
 
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.2, delay: 0.05 }}
 
             >
 
@@ -512,7 +512,7 @@ export default function About() {
 
               viewport={{ once: true }}
 
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.05 }}
 
               className="bg-white dark:bg-gray-800 rounded-3xl p-8 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300"
 
@@ -616,7 +616,7 @@ export default function About() {
 
 
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
 
             {values.map((value, index) => (
 
@@ -632,19 +632,19 @@ export default function About() {
 
                 transition={{ delay: index * 0.1 }}
 
-                className="p-7 rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 hover:shadow-xl hover:-translate-y-2 transition-all duration-300"
+                className="p-3 sm:p-5 md:p-7 rounded-xl sm:rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 hover:shadow-xl hover:-translate-y-2 transition-all duration-300"
 
               >
 
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${value.color}`}>
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl flex items-center justify-center mb-2 sm:mb-3 md:mb-5 ${value.color}`}>
 
                   {value.icon}
 
                 </div>
 
-                <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2">{value.title}</h3>
+                <h3 className="font-bold text-gray-900 dark:text-white text-xs sm:text-sm md:text-lg mb-1 sm:mb-2">{value.title}</h3>
 
-                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{value.desc}</p>
+                <p className="text-[10px] sm:text-xs md:text-sm text-gray-500 dark:text-gray-400 leading-snug sm:leading-relaxed">{value.desc}</p>
 
               </motion.div>
 
@@ -702,7 +702,7 @@ export default function About() {
 
             {/* Vertical line */}
 
-            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-400 via-indigo-400 to-green-400 rounded-full" />
+            <div className="absolute left-4 sm:left-6 md:left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-400 via-indigo-400 to-green-400 rounded-full" />
 
             
 
@@ -722,15 +722,15 @@ export default function About() {
 
                   transition={{ delay: index * 0.15 }}
 
-                  className="relative flex items-start gap-8 pl-20"
+                  className="relative flex items-start gap-3 sm:gap-5 md:gap-8 pl-12 sm:pl-16 md:pl-20"
 
                 >
 
                   {/* Year badge */}
 
-                  <div className={`absolute left-0 w-16 h-16 rounded-2xl ${item.dot} flex items-center justify-center text-white font-black text-lg shadow-lg z-10`}>
+                  <div className={`absolute left-0 w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 rounded-xl sm:rounded-2xl ${item.dot} flex items-center justify-center text-white font-black shadow-lg z-10`}>
 
-                    <span className="text-xs">{item.year.slice(2)}</span>
+                    <span className="text-[10px] sm:text-xs md:text-sm">{item.year.slice(2)}</span>
 
                   </div>
 
@@ -738,13 +738,13 @@ export default function About() {
 
                   {/* Content */}
 
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
 
-                    <div className="text-sm font-bold text-blue-600 dark:text-blue-400 mb-2">{item.year}</div>
+                    <div className="text-xs sm:text-sm font-bold text-blue-600 dark:text-blue-400 mb-1 sm:mb-2">{item.year}</div>
 
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-5 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
 
-                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{item.event}</p>
+                      <p className="text-xs sm:text-sm md:text-base text-gray-700 dark:text-gray-300 leading-snug sm:leading-relaxed">{item.event}</p>
 
                     </div>
 
@@ -948,7 +948,7 @@ export default function About() {
 
             >
 
-              <span className="section-label text-cyan-300">
+              <span className="section-label text-blue-300">
 
                 <Heart className="w-3.5 h-3.5" /> Community
 

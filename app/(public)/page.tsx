@@ -66,7 +66,7 @@ const services = [
 
     desc: "Cross-platform iOS & Android apps with React Native.",
 
-    color: "bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400",
+    color: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400",
 
     link: "/services#mobile"
 
@@ -80,7 +80,7 @@ const services = [
 
     desc: "Real-time multiplayer bingo, lottery, and gaming systems.",
 
-    color: "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400",
+    color: "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400",
 
     link: "/services#gaming"
 
@@ -94,7 +94,7 @@ const services = [
 
     desc: "POS, inventory, rental management, and debt tracking.",
 
-    color: "bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400",
+    color: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300",
 
     link: "/services#enterprise"
 
@@ -108,7 +108,7 @@ const services = [
 
     desc: "Telegram bots and AI chatbots for automation.",
 
-    color: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400",
+    color: "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300",
 
     link: "/services#bots"
 
@@ -136,13 +136,13 @@ const services = [
 
 const stats = [
 
-  { value: 50, label: "Projects Delivered", icon: <Award className="w-5 h-5" />, suffix: "+", color: "blue" },
+  { value: 50, label: "Projects Delivered", icon: <Award className="w-4 h-4 sm:w-5 sm:h-5" />, suffix: "+", color: "blue" },
 
-  { value: 100, label: "Happy Clients", icon: <Users className="w-5 h-5" />, suffix: "+", color: "green" },
+  { value: 100, label: "Happy Clients", icon: <Users className="w-4 h-4 sm:w-5 sm:h-5" />, suffix: "+", color: "indigo" },
 
-  { value: 5, label: "Years of Excellence", icon: <Star className="w-5 h-5" />, suffix: "+", color: "purple" },
+  { value: 5, label: "Years of Excellence", icon: <Star className="w-4 h-4 sm:w-5 sm:h-5" />, suffix: "+", color: "blue" },
 
-  { value: 30, label: "Expert Developers", icon: <Zap className="w-5 h-5" />, suffix: "+", color: "orange" },
+  { value: 30, label: "Expert Developers", icon: <Zap className="w-4 h-4 sm:w-5 sm:h-5" />, suffix: "+", color: "indigo" },
 
 ];
 
@@ -210,7 +210,13 @@ const testimonials = [
 
 
 
-// Page transition
+// Deterministic positions avoid SSR/client hydration mismatches from Math.random()
+const HERO_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+  left: ((i * 37 + 17) % 97) + 1,
+  top: ((i * 53 + 23) % 93) + 2,
+  duration: 3 + (i % 4),
+  delay: (i * 0.25) % 5,
+}));
 
 export default function Home() {
 
@@ -220,7 +226,7 @@ export default function Home() {
 
       {/* Premium Hero Section with Fixed Cinematic Background */}
 
-      <section className="relative text-white overflow-hidden h-screen flex items-center z-10">
+      <section className="relative text-white overflow-hidden min-h-[85vh] sm:min-h-screen flex items-center z-10">
 
         {/* Fixed Cinematic Background - Stays in place while content scrolls */}
 
@@ -326,7 +332,7 @@ export default function Home() {
 
         <div className="fixed inset-0 -z-10 pointer-events-none">
 
-          {[...Array(20)].map((_, i) => (
+          {HERO_PARTICLES.map((particle, i) => (
 
             <motion.div
 
@@ -336,9 +342,9 @@ export default function Home() {
 
               style={{
 
-                left: `${Math.random() * 100}%`,
+                left: `${particle.left}%`,
 
-                top: `${Math.random() * 100}%`,
+                top: `${particle.top}%`,
 
               }}
 
@@ -352,11 +358,11 @@ export default function Home() {
 
               transition={{
 
-                duration: 3 + Math.random() * 4,
+                duration: particle.duration,
 
                 repeat: Infinity,
 
-                delay: Math.random() * 5,
+                delay: particle.delay,
 
               }}
 
@@ -372,7 +378,7 @@ export default function Home() {
 
         <div className="relative z-20 w-full">
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20">
 
             <div className="grid lg:grid-cols-2 gap-12 items-center">
 
@@ -398,7 +404,7 @@ export default function Home() {
 
                   transition={{ delay: 0.4, duration: 0.6 }}
 
-                  className="inline-flex items-center gap-3 glass-premium rounded-full px-6 py-3 mb-8 border border-white/20 hover:border-white/40 transition-all duration-500 shadow-2xl backdrop-blur-xl"
+                  className="inline-flex items-center gap-2 sm:gap-3 glass-premium rounded-full px-4 py-2 sm:px-6 sm:py-3 mb-4 sm:mb-8 border border-white/20 hover:border-white/40 transition-all duration-500 shadow-2xl backdrop-blur-xl"
 
                 >
 
@@ -408,7 +414,7 @@ export default function Home() {
 
                     transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
 
-                    className="text-2xl"
+                    className="text-lg sm:text-2xl"
 
                   >
 
@@ -416,7 +422,7 @@ export default function Home() {
 
                   </motion.span>
 
-                  <span className="text-sm font-bold text-white/95 tracking-wide">
+                  <span className="text-xs sm:text-sm font-bold text-white/95 tracking-wide">
 
                     Founded 2019 • Addis Ababa, Ethiopia
 
@@ -438,7 +444,7 @@ export default function Home() {
 
                 >
 
-                  <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.1] mb-6">
+                  <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.1] mb-4 sm:mb-6">
 
                     <motion.span
 
@@ -504,7 +510,7 @@ export default function Home() {
 
                   transition={{ delay: 1.2, duration: 0.8 }}
 
-                  className="text-xl sm:text-2xl text-gray-200 mb-12 max-w-xl leading-relaxed font-light"
+                  className="text-base sm:text-xl md:text-2xl text-gray-200 mb-8 sm:mb-12 max-w-xl leading-relaxed font-light"
 
                 >
 
@@ -542,7 +548,7 @@ export default function Home() {
 
                       href="/contact"
 
-                      className="group relative inline-flex items-center gap-3 bg-white text-blue-900 px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-blue-500/50 transition-all duration-500 overflow-hidden"
+                      className="group relative inline-flex items-center gap-2 sm:gap-3 bg-white text-blue-900 px-5 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-lg shadow-2xl hover:shadow-blue-500/50 transition-all duration-500 overflow-hidden"
 
                     >
 
@@ -596,7 +602,7 @@ export default function Home() {
 
                       href="/projects"
 
-                      className="inline-flex items-center gap-3 glass-premium text-white px-8 py-4 rounded-2xl font-bold text-lg border border-white/30 hover:border-white/60 hover:bg-white/20 transition-all duration-500 shadow-xl backdrop-blur-xl"
+                      className="inline-flex items-center gap-2 sm:gap-3 glass-premium text-white px-5 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-lg border border-white/30 hover:border-white/60 hover:bg-white/20 transition-all duration-500 shadow-xl backdrop-blur-xl"
 
                     >
 
@@ -658,7 +664,7 @@ export default function Home() {
 
                     <div className="flex items-center gap-2">
 
-                      <span className="text-green-400">✓</span>
+                      <span className="text-blue-400">✓</span>
 
                       <span className="text-gray-300">Website Development</span>
 
@@ -666,7 +672,7 @@ export default function Home() {
 
                     <div className="flex items-center gap-2">
 
-                      <span className="text-green-400">✓</span>
+                      <span className="text-blue-400">✓</span>
 
                       <span className="text-gray-300">Mobile Applications</span>
 
@@ -674,7 +680,7 @@ export default function Home() {
 
                     <div className="flex items-center gap-2">
 
-                      <span className="text-green-400">✓</span>
+                      <span className="text-blue-400">✓</span>
 
                       <span className="text-gray-300">Enterprise Systems</span>
 
@@ -682,7 +688,7 @@ export default function Home() {
 
                     <div className="flex items-center gap-2">
 
-                      <span className="text-green-400">✓</span>
+                      <span className="text-blue-400">✓</span>
 
                       <span className="text-gray-300">AI & Automation</span>
 
@@ -690,7 +696,7 @@ export default function Home() {
 
                     <div className="flex items-center gap-2">
 
-                      <span className="text-green-400">✓</span>
+                      <span className="text-blue-400">✓</span>
 
                       <span className="text-gray-300">Cloud & DevOps</span>
 
@@ -702,7 +708,7 @@ export default function Home() {
 
                   {/* Floating badges */}
 
-                  <div className="absolute -top-4 -right-4 bg-green-500 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg">
+                  <div className="absolute -top-4 -right-4 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg">
 
                     50+ Projects
 
@@ -782,7 +788,7 @@ export default function Home() {
 
       {/* Stats Section with Glassmorphism */}
 
-      <section className="relative z-20 py-20 bg-white/75 dark:bg-gray-950/75 backdrop-blur-lg overflow-hidden">
+      <section className="relative z-20 py-10 sm:py-16 md:py-20 bg-white/75 dark:bg-gray-950/75 backdrop-blur-lg overflow-hidden">
 
         <div className="absolute inset-0 opacity-30">
 
@@ -796,7 +802,7 @@ export default function Home() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-4 gap-1.5 sm:gap-3 md:gap-6">
 
             {stats.map((stat, i) => (
 
@@ -818,7 +824,7 @@ export default function Home() {
 
               >
 
-                <div className="relative p-8 rounded-3xl glass-card-hover-premium shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden h-full text-center">
+                <div className="relative p-2 sm:p-4 md:p-8 rounded-xl sm:rounded-2xl md:rounded-3xl glass-card-hover-premium shadow-md sm:shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden h-full text-center">
 
                   {/* Gradient Overlay */}
 
@@ -828,7 +834,7 @@ export default function Home() {
 
                   {/* Icon */}
 
-                  <div className="relative inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                  <div className="relative inline-flex items-center justify-center w-7 h-7 sm:w-10 sm:h-10 md:w-14 md:h-14 rounded-lg sm:rounded-xl md:rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white mb-1 sm:mb-2 md:mb-4 shadow-md group-hover:scale-110 transition-transform">
 
                     {stat.icon}
 
@@ -846,11 +852,11 @@ export default function Home() {
 
                       suffix={stat.suffix}
 
-                      className="text-4xl font-black text-gray-900 dark:text-white mb-2"
+                      className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-black text-gray-900 dark:text-white mb-0.5 sm:mb-1 md:mb-2"
 
                     />
 
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{stat.label}</p>
+                    <p className="text-[9px] sm:text-[11px] md:text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400 leading-tight px-0.5">{stat.label}</p>
 
                   </div>
 
@@ -876,7 +882,7 @@ export default function Home() {
 
       {/* Process Section with Premium Animations */}
 
-      <section className="relative z-20 py-32 bg-white/90 dark:bg-gray-950/90 backdrop-blur-xl overflow-hidden">
+      <section className="relative z-20 py-14 sm:py-24 md:py-32 bg-white/90 dark:bg-gray-950/90 backdrop-blur-xl overflow-hidden">
 
         {/* Subtle Grid Background */}
 
@@ -894,7 +900,7 @@ export default function Home() {
 
             viewport={{ once: true }}
 
-            className="text-center mb-20"
+            className="text-center mb-10 sm:mb-16 md:mb-20"
 
           >
 
@@ -916,13 +922,13 @@ export default function Home() {
 
             </motion.span>
 
-            <h2 className="text-5xl sm:text-6xl font-black text-gray-900 dark:text-white mb-6">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 dark:text-white mb-3 sm:mb-6">
 
               How We Work
 
             </h2>
 
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            <p className="text-sm sm:text-base md:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto px-2">
 
               Agile, transparent, and delivery-focused. Every project gets full team attention.
 
@@ -932,7 +938,7 @@ export default function Home() {
 
 
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 relative">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 md:gap-8 relative">
 
             {processSteps.map((step, index) => (
 
@@ -966,7 +972,7 @@ export default function Home() {
 
                   <motion.div
 
-                    className="relative inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 text-white font-black text-2xl shadow-2xl shadow-blue-500/30 mb-8"
+                    className="relative inline-flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-xl sm:rounded-2xl md:rounded-3xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 text-white font-black text-sm sm:text-lg md:text-xl lg:text-2xl shadow-lg sm:shadow-2xl shadow-blue-500/30 mb-2 sm:mb-4 md:mb-6 lg:mb-8"
 
                     whileHover={{ scale: 1.1, rotate: 5 }}
 
@@ -1056,9 +1062,9 @@ export default function Home() {
 
 
 
-                  <h3 className="font-black text-gray-900 dark:text-white text-xl mb-3">{step.title}</h3>
+                  <h3 className="font-black text-gray-900 dark:text-white text-xs sm:text-base md:text-lg lg:text-xl mb-1 sm:mb-2 md:mb-3">{step.title}</h3>
 
-                  <p className="text-base text-gray-600 dark:text-gray-400 leading-relaxed px-2">{step.desc}</p>
+                  <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-600 dark:text-gray-400 leading-snug sm:leading-relaxed px-1 sm:px-2">{step.desc}</p>
 
                 </motion.div>
 
@@ -1076,7 +1082,7 @@ export default function Home() {
 
       {/* Why Choose Us Section with Premium Cards */}
 
-      <section className="relative z-20 py-32 bg-white/85 dark:bg-gray-950/85 backdrop-blur-xl overflow-hidden">
+      <section className="relative z-20 py-14 sm:py-24 md:py-32 bg-white/85 dark:bg-gray-950/85 backdrop-blur-xl overflow-hidden">
 
         {/* Animated Background Pattern */}
 
@@ -1092,7 +1098,7 @@ export default function Home() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          <div className="grid lg:grid-cols-2 gap-20 items-center">
+          <div className="grid lg:grid-cols-2 gap-10 sm:gap-16 md:gap-20 items-center">
 
             <motion.div
 
@@ -1116,7 +1122,7 @@ export default function Home() {
 
                 transition={{ delay: 0.2 }}
 
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-sm font-bold tracking-wide mb-6"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-blue-400 text-sm font-bold tracking-wide mb-6"
 
               >
 
@@ -1124,13 +1130,13 @@ export default function Home() {
 
               </motion.span>
 
-              <h2 className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white mb-6 leading-tight">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white mb-4 sm:mb-6 leading-tight">
 
                 We Own Every Project From Start to Finish.
 
               </h2>
 
-              <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed mb-10">
+              <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-400 leading-relaxed mb-6 sm:mb-10">
 
                 We're not a body shop. Every project gets our full team's attention — agile planning, sprint delivery, cybersecurity audits, and long-term support. That's the Syntax way.
 
@@ -1138,7 +1144,7 @@ export default function Home() {
 
 
 
-              <ul className="space-y-5 mb-10">
+              <ul className="space-y-3 sm:space-y-4 md:space-y-5 mb-6 sm:mb-10">
 
                 {[
 
@@ -1172,7 +1178,7 @@ export default function Home() {
 
                     <motion.span
 
-                      className="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-900/40 flex items-center justify-center flex-shrink-0 shadow-sm"
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center flex-shrink-0 shadow-sm"
 
                       whileHover={{ scale: 1.1, rotate: 5 }}
 
@@ -1180,11 +1186,11 @@ export default function Home() {
 
                     >
 
-                      <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 dark:text-blue-400" />
 
                     </motion.span>
 
-                    <span className="text-gray-700 dark:text-gray-300 font-medium text-lg pt-1.5">{item.text}</span>
+                    <span className="text-gray-700 dark:text-gray-300 font-medium text-sm sm:text-base md:text-lg pt-0.5 sm:pt-1.5">{item.text}</span>
 
                   </motion.li>
 
@@ -1202,7 +1208,7 @@ export default function Home() {
 
               >
 
-                <Link href="/about" className="inline-flex items-center gap-3 bg-blue-600 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl shadow-blue-500/30 hover:shadow-blue-500/50 hover:bg-blue-700 transition-all duration-300">
+                <Link href="/about" className="inline-flex items-center gap-2 sm:gap-3 bg-blue-600 text-white px-5 py-3 sm:px-6 sm:py-3.5 md:px-8 md:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base md:text-lg shadow-2xl shadow-blue-500/30 hover:shadow-blue-500/50 hover:bg-blue-700 transition-all duration-300">
 
                   About Our Team <ArrowRight className="w-5 h-5" />
 
@@ -1224,7 +1230,7 @@ export default function Home() {
 
               transition={{ duration: 0.7 }}
 
-              className="grid grid-cols-2 gap-6"
+              className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6"
 
             >
 
@@ -1248,7 +1254,7 @@ export default function Home() {
 
                 >
 
-                  <div className="relative p-8 rounded-3xl glass-card-hover-premium shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden h-full">
+                  <div className="relative p-3 sm:p-4 md:p-8 rounded-xl sm:rounded-2xl md:rounded-3xl glass-card-hover-premium shadow-md sm:shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden h-full">
 
                     {/* Gradient Overlay */}
 
@@ -1260,7 +1266,7 @@ export default function Home() {
 
                     <motion.div
 
-                      className="relative text-5xl mb-4"
+                      className="relative text-xl sm:text-2xl md:text-4xl lg:text-5xl mb-1.5 sm:mb-2 md:mb-4"
 
                       animate={{ y: [0, -5, 0] }}
 
@@ -1274,9 +1280,9 @@ export default function Home() {
 
                     
 
-                    <h4 className="relative font-black text-gray-900 dark:text-white text-lg mb-2">{benefit.title}</h4>
+                    <h4 className="relative font-black text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg mb-0.5 sm:mb-1 md:mb-2">{benefit.title}</h4>
 
-                    <p className="relative text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{benefit.desc}</p>
+                    <p className="relative text-[10px] sm:text-xs md:text-sm text-gray-600 dark:text-gray-400 leading-snug sm:leading-relaxed">{benefit.desc}</p>
 
 
 
@@ -1318,7 +1324,7 @@ export default function Home() {
 
       {/* Testimonials Section */}
 
-      <section className="relative z-20 py-24 bg-gradient-to-br from-blue-600 to-indigo-700 text-white">
+      <section className="relative z-20 py-14 sm:py-20 md:py-24 bg-gradient-to-br from-blue-600 to-indigo-700 text-white">
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -1330,11 +1336,11 @@ export default function Home() {
 
             viewport={{ once: true }}
 
-            className="text-center mb-16"
+            className="text-center mb-8 sm:mb-12 md:mb-16"
 
           >
 
-            <span className="section-label text-cyan-300">
+            <span className="section-label text-blue-300">
 
               <Star className="w-3.5 h-3.5" /> Client Stories
 
@@ -1366,7 +1372,7 @@ export default function Home() {
 
       {/* Projects Preview Section with Zoom Effects */}
 
-      <section className="relative z-20 py-32 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
+      <section className="relative z-20 py-14 sm:py-24 md:py-32 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -1378,7 +1384,7 @@ export default function Home() {
 
             viewport={{ once: true }}
 
-            className="text-center mb-20"
+            className="text-center mb-10 sm:mb-16 md:mb-20"
 
           >
 
@@ -1392,7 +1398,7 @@ export default function Home() {
 
               transition={{ delay: 0.2 }}
 
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-sm font-bold tracking-wide mb-6"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-sm font-bold tracking-wide mb-6"
 
             >
 
@@ -1400,13 +1406,13 @@ export default function Home() {
 
             </motion.span>
 
-            <h2 className="text-5xl sm:text-6xl font-black text-gray-900 dark:text-white mb-6">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 dark:text-white mb-3 sm:mb-6">
 
               Selected Projects
 
             </h2>
 
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            <p className="text-sm sm:text-base md:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto px-2">
 
               A showcase of our work across healthcare, e-commerce, enterprise, and gaming.
 
@@ -1418,7 +1424,7 @@ export default function Home() {
 
           {/* Premium project cards with hover effects */}
 
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-10 sm:mb-16">
 
             {[
 
@@ -1666,7 +1672,7 @@ export default function Home() {
 
       {/* Newsletter Section */}
 
-      <section className="relative z-20 py-24 bg-gray-50 dark:bg-gray-900">
+      <section className="relative z-20 py-24 bg-transparent">
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 

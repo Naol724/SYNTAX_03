@@ -55,26 +55,34 @@ export function HeroBackground() {
   );
 }
 
-{/* Floating Particles Effect */}
+const PARTICLE_POSITIONS = Array.from({ length: 20 }, (_, i) => ({
+  left: ((i * 37 + 17) % 97) + 1,
+  top: ((i * 53 + 23) % 93) + 2,
+  duration: 3 + (i % 4),
+  delay: (i * 0.25) % 5,
+}));
+
 export function FloatingParticles({ count = 20 }: { count?: number }) {
+  const particles = PARTICLE_POSITIONS.slice(0, count);
+
   return (
     <div className="fixed inset-0 z-10 pointer-events-none">
-      {[...Array(count)].map((_, i) => (
+      {particles.map((particle, i) => (
         <motion.div
           key={i}
           className="absolute w-1 h-1 bg-white/30 rounded-full"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            left: `${particle.left}%`,
+            top: `${particle.top}%`,
           }}
           animate={{
             y: [0, -30, 0],
             opacity: [0, 1, 0],
           }}
           transition={{
-            duration: 3 + Math.random() * 4,
+            duration: particle.duration,
             repeat: Infinity,
-            delay: Math.random() * 5,
+            delay: particle.delay,
           }}
         />
       ))}

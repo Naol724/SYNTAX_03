@@ -119,8 +119,8 @@ export function Newsletter({
           animate={{ opacity: 1, scale: 1 }}
           className="text-center py-8"
         >
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-            <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+            <CheckCircle className="w-8 h-8 text-blue-600 dark:text-blue-400" />
           </div>
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
             Thanks for subscribing!
