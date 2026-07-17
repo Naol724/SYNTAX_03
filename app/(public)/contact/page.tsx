@@ -856,6 +856,8 @@ export default function Contact() {
 
                                       <select
 
+                                        {...field}
+
                                         className="w-full pl-4 pr-11 h-12 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer"
 
                                       >
