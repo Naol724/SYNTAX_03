@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, FileText, Calendar, TrendingUp, DollarSign, Activity } from "lucide-react"
+import { Users, FileText, Calendar, Mail } from "lucide-react"
+import Link from "next/link"
 
 interface DashboardStats {
   totalBookings: number
@@ -11,6 +12,7 @@ interface DashboardStats {
   totalViews: number
   pendingBookings: number
   newLeads: number
+  totalContactMessages: number
 }
 
 interface Booking {
@@ -27,6 +29,15 @@ interface Lead {
   status: string
 }
 
+interface ContactMessage {
+  _id: string
+  name: string
+  email: string
+  subject: string
+  message: string
+  receivedAt: string
+}
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats>({
     totalBookings: 0,
@@ -35,9 +46,11 @@ export default function AdminDashboard() {
     totalViews: 0,
     pendingBookings: 0,
     newLeads: 0,
+    totalContactMessages: 0,
   })
   const [recentBookings, setRecentBookings] = useState<Booking[]>([])
   const [recentLeads, setRecentLeads] = useState<Lead[]>([])
+  const [recentMessages, setRecentMessages] = useState<ContactMessage[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -62,6 +75,12 @@ export default function AdminDashboard() {
       const leadsData = await leadsRes.json()
       if (leadsRes.ok && leadsData.leads) {
         setRecentLeads(leadsData.leads)
+      }
+
+      const messagesRes = await fetch("/api/admin/messages?limit=5")
+      const messagesData = await messagesRes.json()
+      if (messagesRes.ok && messagesData.messages) {
+        setRecentMessages(messagesData.messages)
       }
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error)
@@ -93,11 +112,11 @@ export default function AdminDashboard() {
       change: `Active blog content`,
     },
     {
-      title: "Total Views",
-      value: stats.totalViews.toLocaleString(),
-      icon: Activity,
-      color: "bg-orange-500",
-      change: "Views across all posts",
+      title: "Contact Messages",
+      value: stats.totalContactMessages,
+      icon: Mail,
+      color: "bg-indigo-500",
+      change: stats.totalContactMessages > 0 ? "From contact form" : "No messages yet",
     },
   ]
 
@@ -137,7 +156,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Recent Bookings</CardTitle>
@@ -193,6 +212,37 @@ export default function AdminDashboard() {
               ))}
               {recentLeads.length === 0 && (
                 <p className="text-sm text-gray-500 text-center py-4">No recent leads</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Recent Contact Messages</CardTitle>
+            <Link
+              href="/admin/messages"
+              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              View all
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentMessages.map((msg) => (
+                <div key={msg._id} className="p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/40">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-medium text-gray-900 dark:text-white truncate">{msg.name}</p>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">
+                      {new Date(msg.receivedAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className="text-sm text-blue-600 dark:text-blue-400 truncate">{msg.subject}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-1">{msg.message}</p>
+                </div>
+              ))}
+              {recentMessages.length === 0 && (
+                <p className="text-sm text-gray-500 text-center py-4">No contact messages yet</p>
               )}
             </div>
           </CardContent>

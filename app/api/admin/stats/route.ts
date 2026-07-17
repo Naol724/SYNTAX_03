@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { connectToDatabase } from "@/lib/mongoose"
 import { Booking, Lead, BlogPost, Service, Testimonial, Portfolio } from "@/lib/models"
+import { getContactMessageCount } from "@/lib/storage"
 
 export async function GET(req: NextRequest) {
   try {
@@ -31,6 +32,7 @@ export async function GET(req: NextRequest) {
     const totalServices = await Service.countDocuments()
     const totalTestimonials = await Testimonial.countDocuments()
     const totalPortfolio = await Portfolio.countDocuments()
+    const totalContactMessages = await getContactMessageCount()
 
     // 2. Generate daily analytics for the past 7 days (fallback data)
     const sevenDaysAgo = new Date()
@@ -63,6 +65,7 @@ export async function GET(req: NextRequest) {
         totalServices,
         totalTestimonials,
         totalPortfolio,
+        totalContactMessages,
         uniqueVisitors: totalUniqueVisitors
       },
       dailyData: dailyData.map(day => ({
