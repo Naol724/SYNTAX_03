@@ -5,7 +5,9 @@ services:
     plan: free
     region: oregon
     rootDir: .
-    buildCommand: npm install && npm run build
+    # --include=dev is required when NODE_ENV=production
+    # otherwise TypeScript is skipped and @/ imports fail the build
+    buildCommand: npm install --include=dev && npm run build
     startCommand: npm start
     healthCheckPath: /
     envVars:
