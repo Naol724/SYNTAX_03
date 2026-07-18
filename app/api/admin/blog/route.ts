@@ -4,6 +4,8 @@ import { authOptions } from "@/lib/auth"
 import { connectToDatabase } from "@/lib/mongoose"
 import Blog from "@/models/Blog"
 
+export const dynamic = "force-dynamic"
+
 // GET - List all blog posts (admin)
 export async function GET(req: NextRequest) {
   try {

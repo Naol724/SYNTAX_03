@@ -9,7 +9,7 @@ services:
     # otherwise TypeScript is skipped and @/ imports fail the build
     buildCommand: npm install --include=dev && npm run build
     startCommand: npm start
-    healthCheckPath: /
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production

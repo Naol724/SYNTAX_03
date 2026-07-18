@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { deleteContactMessage } from "@/lib/storage";
 
+export const dynamic = "force-dynamic";
+
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: { id: string } }

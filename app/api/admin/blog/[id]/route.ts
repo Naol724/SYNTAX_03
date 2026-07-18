@@ -4,6 +4,8 @@ import { authOptions } from "@/lib/auth"
 import { connectToDatabase } from "@/lib/mongoose"
 import Blog from "@/models/Blog"
 
+export const dynamic = "force-dynamic"
+
 // GET - Get single blog post
 export async function GET(
   _req: NextRequest,

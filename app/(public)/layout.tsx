@@ -1,13 +1,17 @@
+import dynamic from "next/dynamic"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { ScrollProgress } from "@/components/ui/scroll-progress"
 import { PageLoader } from "@/components/ui/page-loader"
 import { AnimatedBackground } from "@/components/ui/animated-background"
-import ChatWidget from "@/components/ai/ChatWidget"
+
+const ChatWidget = dynamic(() => import("@/components/ai/ChatWidget"), {
+  ssr: false,
+  loading: () => null,
+})
 
 /**
  * Public pages share one Navbar + one Footer.
- * Footer is transparent glass (no photo) and identical on every page.
  */
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (

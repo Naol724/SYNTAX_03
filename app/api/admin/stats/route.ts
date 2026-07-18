@@ -5,6 +5,9 @@ import { connectToDatabase } from "@/lib/mongoose"
 import { Booking, Lead, BlogPost, Service, Testimonial, Portfolio } from "@/lib/models"
 import { getContactMessageCount } from "@/lib/storage"
 
+export const dynamic = "force-dynamic"
+export const runtime = "nodejs"
+
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
