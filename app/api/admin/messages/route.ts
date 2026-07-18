@@ -4,6 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { getContactMessages, getContactMessageCount } from "@/lib/storage";
 import { ContactMessage } from "@/lib/mongodb";
 
+export const dynamic = "force-dynamic";
+
 function serializeMessage(msg: ContactMessage) {
   return {
     ...msg,
