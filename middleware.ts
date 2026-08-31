@@ -1,23 +1,30 @@
-import { withAuth } from "next-auth/middleware"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server';
 
 /**
- * Protect /admin routes. Missing NEXTAUTH_SECRET must not crash the whole site.
+ * Middleware — JWT-based route protection.
+ * Replaces NextAuth withAuth. Checks localStorage isn't available on edge,
+ * so we use a cookie fallback set by the login page.
  */
-export default withAuth(
-  function middleware() {
-    return NextResponse.next()
-  },
-  {
-    pages: {
-      signIn: "/admin/login",
-    },
-    callbacks: {
-      authorized: ({ token }) => !!token,
-    },
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // Skip login page
+  if (pathname === '/admin/login') return NextResponse.next();
+
+  // Check for auth cookie (set after login)
+  const token = req.cookies.get('syntax_token')?.value;
+
+  if (!token) {
+    const loginUrl = new URL('/admin/login', req.url);
+    loginUrl.searchParams.set('from', pathname);
+    return NextResponse.redirect(loginUrl);
   }
-)
+
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: ["/admin", "/admin/((?!login).*)"],
-}
+  matcher: ['/admin/dashboard/:path*', '/admin/services/:path*', '/admin/portfolio/:path*',
+    '/admin/blog/:path*', '/admin/testimonials/:path*', '/admin/developers/:path*',
+    '/admin/messages/:path*', '/admin/analytics/:path*'],
+};

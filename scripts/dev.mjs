@@ -7,7 +7,7 @@ const nextBin = path.join(projectRoot, "node_modules", "next", "dist", "bin", "n
 
 process.chdir(projectRoot);
 
-const child = spawn(process.execPath, [nextBin, "dev", "-p", "5000"], {
+const child = spawn(process.execPath, [nextBin, "dev", "-p", "3000"], {
   stdio: "inherit",
   cwd: projectRoot,
 });

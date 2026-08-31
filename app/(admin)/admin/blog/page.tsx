@@ -1,414 +1,172 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { useEffect, useState, useCallback } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Loader2, Eye, EyeOff } from "lucide-react";
+import { toast } from "react-hot-toast";
+import api from "@/lib/api";
+import { CrudTable, StatusBadge, type Column } from "@/components/admin/CrudTable";
 
-interface BlogPost {
-  _id: string
-  title: string
-  slug: string
-  excerpt: string
-  content: string
-  featuredImage?: string
-  category: string
-  author: string
-  tags: string[]
-  published: boolean
-  featured: boolean
-  views: number
-  createdAt: string
+interface Blog {
+  blog_id: string;
+  title: string;
+  slug: string;
+  category: string;
+  author_name: string | null;
+  is_published: boolean;
+  is_featured: boolean;
+  views_count: number;
+  publish_date: string | null;
+  tags: string[] | null;
 }
 
-const emptyForm = {
-  title: "",
-  slug: "",
-  excerpt: "",
-  content: "",
-  featuredImage: "",
-  category: "Development",
-  author: "Syntax Team",
-  tagsString: "Next.js, Web Development",
-  published: false,
-  featured: false,
-}
+const EMPTY = { title: "", content: "", excerpt: "", category: "Technology", tags: "", author_name: "Syntax Team", featured_image_url: "", is_published: false, is_featured: false, seo_title: "", seo_description: "" };
 
-export default function AdminBlog() {
-  const [posts, setPosts] = useState<BlogPost[]>([])
-  const [loading, setLoading] = useState(true)
-  
-  // Dialog state
-  const [isOpen, setIsOpen] = useState(false)
-  const [editingPost, setEditingPost] = useState<BlogPost | null>(null)
-  const [formData, setFormData] = useState(emptyForm)
-  const [formLoading, setFormLoading] = useState(false)
+export default function BlogPage() {
+  const [data, setData] = useState<Blog[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Blog | null>(null);
+  const [form, setForm] = useState(EMPTY);
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    fetchPosts()
-  }, [])
-
-  const fetchPosts = async () => {
+  const load = useCallback(async () => {
+    setLoading(true);
     try {
-      const response = await fetch("/api/blog")
-      const data = await response.json()
-      setPosts(data.posts || [])
-    } catch (error) {
-      console.error("Failed to fetch posts:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
+      const res: any = await api.blog.getAll({ page: String(page), limit: "10", ...(search ? { search } : {}) });
+      setData(res?.data ?? res ?? []);
+      setTotal(res?.pagination?.total ?? res?.length ?? 0);
+    } catch { toast.error("Failed to load blog posts"); }
+    finally { setLoading(false); }
+  }, [page, search]);
 
-  const handleTitleChange = (title: string) => {
-    const slug = title
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/[\s_-]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-    
-    setFormData({
-      ...formData,
-      title,
-      slug,
-    })
-  }
+  useEffect(() => { load(); }, [load]);
 
-  const handleOpenAdd = () => {
-    setEditingPost(null)
-    setFormData(emptyForm)
-    setIsOpen(true)
-  }
+  const openAdd = () => { setEditing(null); setForm(EMPTY); setOpen(true); };
+  const openEdit = async (b: Blog) => {
+    const full: any = await api.blog.getById(b.blog_id).catch(() => b);
+    setEditing(b);
+    setForm({ title: full.title, content: full.content ?? "", excerpt: full.excerpt ?? "", category: full.category, tags: full.tags?.join(", ") ?? "", author_name: full.author_name ?? "Syntax Team", featured_image_url: full.featured_image_url ?? "", is_published: full.is_published, is_featured: full.is_featured, seo_title: full.seo_title ?? "", seo_description: full.seo_description ?? "" });
+    setOpen(true);
+  };
 
-  const handleOpenEdit = (post: BlogPost) => {
-    setEditingPost(post)
-    setFormData({
-      title: post.title,
-      slug: post.slug,
-      excerpt: post.excerpt || "",
-      content: post.content || "",
-      featuredImage: post.featuredImage || "",
-      category: post.category || "Development",
-      author: post.author || "Syntax Team",
-      tagsString: post.tags?.join(", ") || "",
-      published: post.published,
-      featured: post.featured,
-    })
-    setIsOpen(true)
-  }
-
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setFormLoading(true)
-
-    const tags = formData.tagsString
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter((tag) => tag.length > 0)
-
-    const payload = {
-      title: formData.title,
-      slug: formData.slug,
-      excerpt: formData.excerpt,
-      content: formData.content,
-      featuredImage: formData.featuredImage,
-      category: formData.category,
-      author: formData.author,
-      tags,
-      published: formData.published,
-      featured: formData.featured,
-    }
-
-    const method = editingPost ? "PATCH" : "POST"
-    const url = editingPost ? `/api/blog/${editingPost._id}` : "/api/blog"
-
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
     try {
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
+      const payload = { ...form, tags: form.tags ? form.tags.split(",").map((t) => t.trim()).filter(Boolean) : [], publish_date: form.is_published ? new Date().toISOString() : undefined };
+      editing ? await api.blog.update(editing.blog_id, payload) : await api.blog.create(payload);
+      toast.success(editing ? "Post updated" : "Post created");
+      setOpen(false); load();
+    } catch (err: any) { toast.error(err.message ?? "Save failed"); }
+    finally { setSaving(false); }
+  };
 
-      if (response.ok) {
-        setIsOpen(false)
-        fetchPosts()
-      } else {
-        const err = await response.json()
-        alert(err.error || "Failed to save blog post")
-      }
-    } catch (error) {
-      console.error("Failed to save post:", error)
-      alert("Something went wrong.")
-    } finally {
-      setFormLoading(false)
-    }
-  }
-
-  const togglePublished = async (id: string, published: boolean) => {
+  const togglePublish = async (b: Blog) => {
     try {
-      await fetch(`/api/blog/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ published: !published }),
-      })
-      fetchPosts()
-    } catch (error) {
-      console.error("Failed to toggle published:", error)
-    }
-  }
+      b.is_published ? await api.blog.unpublish(b.blog_id) : await api.blog.publish(b.blog_id);
+      toast.success(b.is_published ? "Post unpublished" : "Post published");
+      load();
+    } catch { toast.error("Failed to update status"); }
+  };
 
-  const toggleFeatured = async (id: string, featured: boolean) => {
-    try {
-      await fetch(`/api/blog/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ featured: !featured }),
-      })
-      fetchPosts()
-    } catch (error) {
-      console.error("Failed to toggle featured:", error)
-    }
-  }
-
-  const deletePost = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this post?")) return
-    try {
-      await fetch(`/api/blog/${id}`, { method: "DELETE" })
-      fetchPosts()
-    } catch (error) {
-      console.error("Failed to delete post:", error)
-    }
-  }
-
-  if (loading) {
-    return <div className="p-6 text-gray-600 dark:text-gray-400">Loading...</div>
-  }
+  const columns: Column<Blog>[] = [
+    { key: "title", label: "Title", render: (r) => <span className="font-medium text-gray-900 dark:text-white max-w-xs truncate block">{r.title}</span> },
+    { key: "category", label: "Category", render: (r) => <span className="text-xs text-gray-500 dark:text-slate-400">{r.category}</span> },
+    { key: "author_name", label: "Author", render: (r) => <span className="text-xs">{r.author_name ?? "—"}</span> },
+    { key: "is_published", label: "Status", render: (r) => <StatusBadge active={r.is_published} trueLabel="Published" falseLabel="Draft" /> },
+    { key: "views_count", label: "Views", render: (r) => <span className="text-xs text-gray-500">{r.views_count}</span> },
+  ];
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Blog</h1>
-          <p className="text-gray-600 dark:text-gray-400">Manage blog posts</p>
-        </div>
-        <Button onClick={handleOpenAdd}>
-          <Plus className="w-4 h-4 mr-2" />
-          New Post
-        </Button>
-      </div>
+    <>
+      <CrudTable
+        title="Blog" subtitle="Create and manage blog posts"
+        data={data} columns={columns} total={total} page={page} limit={10} loading={loading}
+        onSearch={(q) => { setSearch(q); setPage(1); }} onPageChange={setPage}
+        onAdd={openAdd} onEdit={openEdit}
+        onDelete={async (id) => { await api.blog.delete(id); load(); }}
+        idKey="blog_id" addLabel="New Post" searchPlaceholder="Search posts..."
+        extraActions={(r) => (
+          <Button size="sm" variant="ghost" onClick={() => togglePublish(r)} className="h-7 w-7 p-0" title={r.is_published ? "Unpublish" : "Publish"}>
+            {r.is_published ? <EyeOff className="w-3.5 h-3.5 text-orange-500" /> : <Eye className="w-3.5 h-3.5 text-green-500" />}
+          </Button>
+        )}
+      />
 
-      <Card>
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            {posts.map((post) => (
-              <div
-                key={post._id}
-                className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors"
-              >
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
-                      {post.title}
-                    </h3>
-                    <Badge className={post.published ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400" : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400"}>
-                      {post.published ? "Published" : "Draft"}
-                    </Badge>
-                    {post.featured && (
-                      <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
-                        Featured
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2 max-w-3xl">
-                    {post.excerpt}
-                  </p>
-                  <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-                    <span>Category: {post.category}</span>
-                    <span>Author: {post.author}</span>
-                    <span>Views: {post.views}</span>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => togglePublished(post._id, post.published)}>
-                    {post.published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={() => toggleFeatured(post._id, post.featured)}>
-                    {post.featured ? "Unfeature" : "Feature"}
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={() => handleOpenEdit(post)}>
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={() => deletePost(post._id)}>
-                    <Trash2 className="w-4 h-4 text-red-500" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-            {posts.length === 0 && (
-              <p className="text-center text-gray-500 dark:text-gray-400 py-8">
-                No posts found
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Add / Edit Dialog */}
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-2xl bg-white dark:bg-gray-800 border dark:border-gray-700 text-gray-900 dark:text-white max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {editingPost ? "Edit Blog Post" : "Create New Blog Post"}
-            </DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleFormSubmit} className="space-y-4 pt-2">
-            <div className="space-y-2">
-              <Label htmlFor="title">Post Title</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                required
-                placeholder="e.g. Next.js 15 Routing Patterns"
-                className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
-              />
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{editing ? "Edit Post" : "New Post"}</DialogTitle></DialogHeader>
+          <form onSubmit={handleSave} className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label>Title *</Label>
+              <Input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Getting Started with Next.js 15" />
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="slug">Slug (Auto-generated)</Label>
-                <Input
-                  id="slug"
-                  value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  required
-                  placeholder="e.g. nextjs-15-routing-patterns"
-                  className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                <select
-                  id="category"
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full h-10 px-3 rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                >
-                  <option value="Development">Development</option>
-                  <option value="Design">Design</option>
-                  <option value="Technology">Technology</option>
-                  <option value="Business">Business</option>
-                  <option value="Tutorial">Tutorial</option>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Category *</Label>
+                <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring">
+                  {["Technology", "Tutorial", "Development", "Design", "Business", "News"].map((c) => <option key={c}>{c}</option>)}
                 </select>
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="author">Author Name</Label>
-                <Input
-                  id="author"
-                  value={formData.author}
-                  onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                  required
-                  className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="tagsString">Tags (Comma-separated)</Label>
-                <Input
-                  id="tagsString"
-                  value={formData.tagsString}
-                  onChange={(e) => setFormData({ ...formData, tagsString: e.target.value })}
-                  placeholder="React, Next.js, Routing"
-                  className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
-                />
+              <div className="space-y-1.5">
+                <Label>Author</Label>
+                <Input value={form.author_name} onChange={(e) => setForm({ ...form, author_name: e.target.value })} placeholder="Syntax Team" />
               </div>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="featuredImage">Featured Image URL</Label>
-              <Input
-                id="featuredImage"
-                value={formData.featuredImage}
-                onChange={(e) => setFormData({ ...formData, featuredImage: e.target.value })}
-                placeholder="e.g. /images/blog/my-post.jpg"
-                className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
-              />
+            <div className="space-y-1.5">
+              <Label>Tags (comma-separated)</Label>
+              <Input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="nextjs, react, typescript" />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="excerpt">Excerpt / Summary</Label>
-              <Textarea
-                id="excerpt"
-                value={formData.excerpt}
-                onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                placeholder="A short snippet that describes the post..."
-                className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
-                rows={2}
-              />
+            <div className="space-y-1.5">
+              <Label>Featured Image URL</Label>
+              <Input value={form.featured_image_url} onChange={(e) => setForm({ ...form, featured_image_url: e.target.value })} placeholder="https://..." />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="content">Post Content (HTML Supported)</Label>
-              <Textarea
-                id="content"
-                value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                required
-                placeholder="Write your article content here..."
-                className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-mono"
-                rows={8}
-              />
+            <div className="space-y-1.5">
+              <Label>Excerpt</Label>
+              <Textarea rows={2} value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} placeholder="Brief summary shown in blog listing..." />
             </div>
-
-            <div className="flex items-center gap-6 pt-2">
-              <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.published}
-                  onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
-                />
-                Publish Immediately
-              </label>
-
-              <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.featured}
-                  onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
-                />
-                Feature this post
-              </label>
+            <div className="space-y-1.5">
+              <Label>Content *</Label>
+              <Textarea required rows={8} value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} placeholder="Write your blog post content here..." className="font-mono text-sm" />
             </div>
-
-            <DialogFooter className="pt-4 border-t dark:border-gray-700">
-              <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={formLoading}>
-                {formLoading ? "Saving..." : "Save Post"}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>SEO Title</Label>
+                <Input value={form.seo_title} onChange={(e) => setForm({ ...form, seo_title: e.target.value })} placeholder="Optional SEO title override" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>SEO Description</Label>
+                <Input value={form.seo_description} onChange={(e) => setForm({ ...form, seo_description: e.target.value })} placeholder="Meta description for search engines" />
+              </div>
+            </div>
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <Switch checked={form.is_published} onCheckedChange={(v) => setForm({ ...form, is_published: v })} id="pub" />
+                <Label htmlFor="pub">Publish Now</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch checked={form.is_featured} onCheckedChange={(v) => setForm({ ...form, is_featured: v })} id="feat" />
+                <Label htmlFor="feat">Featured Post</Label>
+              </div>
+            </div>
+            <DialogFooter className="pt-2">
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+              <Button type="submit" disabled={saving} className="gap-2">
+                {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />} {editing ? "Update" : "Publish"}
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
-    </div>
-  )
+    </>
+  );
 }

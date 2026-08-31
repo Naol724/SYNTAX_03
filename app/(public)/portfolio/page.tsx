@@ -1,213 +1,170 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { motion, AnimatePresence } from "framer-motion"
-import { Lightbox } from "yet-another-react-lightbox"
-import "yet-another-react-lightbox/styles.css"
-import { ExternalLink, Github, Filter } from "lucide-react"
-import Link from "next/link"
+import { useEffect, useState, useCallback } from "react";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { ExternalLink, Github, Loader2, Eye } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import api from "@/lib/api";
 
-interface Project {
-  _id: string
-  title: string
-  slug: string
-  description: string
-  category: string
-  images: string[]
-  thumbnail: string
-  client: string
-  technologies: string[]
-  projectUrl?: string
-  githubUrl?: string
-  featured: boolean
-  active: boolean
+interface Portfolio {
+  portfolio_id: string;
+  project_name: string;
+  portfolio_type: string;
+  language_used: string[] | null;
+  project_link: string | null;
+  github_link: string | null;
+  image_url: string | null;
+  description: string;
+  short_description: string | null;
+  client_name: string | null;
+  is_featured: boolean;
+  views_count: number;
 }
 
 export default function PortfolioPage() {
-  const [projects, setProjects] = useState<Project[]>([])
-  const [filteredProjects, setFilteredProjects] = useState<Project[]>([])
-  const [selectedCategory, setSelectedCategory] = useState("all")
-  const [lightboxOpen, setLightboxOpen] = useState(false)
-  const [lightboxIndex, setLightboxIndex] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const [projects, setProjects] = useState<Portfolio[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [activeType, setActiveType] = useState("all");
+  const [types, setTypes] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<Portfolio | null>(null);
 
-  useEffect(() => {
-    fetchProjects()
-  }, [])
-
-  useEffect(() => {
-    if (selectedCategory === "all") {
-      setFilteredProjects(projects)
-    } else {
-      setFilteredProjects(projects.filter(p => p.category === selectedCategory))
-    }
-  }, [selectedCategory, projects])
-
-  const fetchProjects = async () => {
+  const load = useCallback(async () => {
+    setLoading(true);
+    const params: Record<string, string> = { page: String(page), limit: "9" };
+    if (activeType !== "all") params.type = activeType;
     try {
-      const response = await fetch("/api/public/portfolio")
-      const data = await response.json()
-      setProjects(data.projects || [])
-      setFilteredProjects(data.projects || [])
-    } catch (error) {
-      console.error("Failed to fetch projects:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
+      const res: any = await api.portfolio.getPublic(params);
+      const data = res?.data ?? res ?? [];
+      setProjects(data);
+      setTotal(res?.pagination?.total ?? data.length);
+      if (!types.length && data.length) {
+        const uniqueTypes = [...new Set<string>(data.map((p: Portfolio) => p.portfolio_type))];
+        setTypes(uniqueTypes);
+      }
+    } catch { /* show empty */ }
+    finally { setLoading(false); }
+  }, [page, activeType, types.length]);
 
-  const categories = ["all", ...Array.from(new Set(projects.map(p => p.category)))]
-
-  const openLightbox = (index: number) => {
-    setLightboxIndex(index)
-    setLightboxOpen(true)
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    )
-  }
+  useEffect(() => { load(); }, [load]);
 
   return (
-    <div className="min-h-screen bg-transparent py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-16 sm:py-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-4">
-            Our Portfolio
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
+          <span className="section-label">Our Work</span>
+          <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-foreground mt-3 mb-4">
+            Featured <span className="gradient-text">Projects</span>
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Explore our latest projects and see how we bring ideas to life
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            A showcase of the solutions we've built for our clients across industries.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Filter */}
-        <div className="flex items-center justify-center mb-8">
-          <div className="flex items-center gap-3 bg-white dark:bg-gray-800 rounded-xl p-2 shadow-lg">
-            <Filter className="w-5 h-5 text-gray-400 ml-2" />
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-40 border-0 focus:ring-0">
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category.charAt(0).toUpperCase() + category.slice(1)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Projects Grid */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={selectedCategory}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            {filteredProjects.map((project, index) => (
-              <motion.div
-                key={project._id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card className="overflow-hidden bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow">
-                  <div 
-                    className="relative h-48 bg-gray-200 dark:bg-gray-700 cursor-pointer overflow-hidden"
-                    onClick={() => openLightbox(index)}
-                  >
-                    <img
-                      src={project.thumbnail || project.images[0]}
-                      alt={project.title}
-                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <span className="text-white font-semibold">View Gallery</span>
-                    </div>
-                  </div>
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                        {project.title}
-                      </h3>
-                      {project.featured && (
-                        <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
-                          Featured
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
-                      {project.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {project.technologies.slice(0, 3).map((tech, i) => (
-                        <Badge key={i} variant="outline" className="text-xs">
-                          {tech}
-                        </Badge>
-                      ))}
-                      {project.technologies.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{project.technologies.length - 3}
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex gap-2">
-                      {project.projectUrl && (
-                        <Button size="sm" variant="outline" className="flex-1" asChild>
-                          <Link href={project.projectUrl} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="w-4 h-4 mr-2" />
-                            Live
-                          </Link>
-                        </Button>
-                      )}
-                      {project.githubUrl && (
-                        <Button size="sm" variant="outline" className="flex-1" asChild>
-                          <Link href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                            <Github className="w-4 h-4 mr-2" />
-                            Code
-                          </Link>
-                        </Button>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+        {/* Filters */}
+        {types.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-2 mb-10">
+            {["all", ...types].map((t) => (
+              <button key={t} onClick={() => { setActiveType(t); setPage(1); }} className={`px-4 py-1.5 rounded-full text-sm font-medium capitalize transition-all ${activeType === t ? "bg-blue-600 text-white shadow-md shadow-blue-500/30" : "bg-muted text-muted-foreground hover:text-foreground"}`}>
+                {t === "all" ? "All Projects" : t.replace("-", " ")}
+              </button>
             ))}
-          </motion.div>
-        </AnimatePresence>
-
-        {filteredProjects.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">No projects found in this category.</p>
           </div>
         )}
 
-        {/* Lightbox */}
-        <Lightbox
-          open={lightboxOpen}
-          close={() => setLightboxOpen(false)}
-          slides={filteredProjects.map(p => ({ src: p.images[0] || p.thumbnail }))}
-          index={lightboxIndex}
-        />
+        {/* Grid */}
+        {loading ? (
+          <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-blue-500" /></div>
+        ) : projects.length === 0 ? (
+          <div className="text-center py-20 text-muted-foreground">No projects found</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {projects.map((p, i) => (
+              <motion.div key={p.portfolio_id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
+                className="group rounded-2xl border border-border bg-card overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+                onClick={() => setSelected(p)}
+              >
+                <div className="relative h-52 bg-muted overflow-hidden">
+                  {p.image_url ? (
+                    <Image src={p.image_url} alt={p.project_name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-950 dark:to-indigo-950 flex items-center justify-center">
+                      <span className="text-5xl">🖼️</span>
+                    </div>
+                  )}
+                  {p.is_featured && <div className="absolute top-3 left-3"><Badge className="bg-blue-600 text-white text-[10px]">Featured</Badge></div>}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                    <div className="text-white text-sm font-medium flex items-center gap-1.5"><Eye className="w-4 h-4" /> View Details</div>
+                  </div>
+                </div>
+                <div className="p-5">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="font-bold text-foreground leading-snug">{p.project_name}</h3>
+                    <Badge variant="outline" className="text-[10px] capitalize flex-shrink-0">{p.portfolio_type}</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{p.short_description ?? p.description}</p>
+                  {p.language_used && (
+                    <div className="flex flex-wrap gap-1">
+                      {p.language_used.slice(0, 4).map((lang) => <Badge key={lang} variant="secondary" className="text-[10px]">{lang}</Badge>)}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {Math.ceil(total / 9) > 1 && (
+          <div className="flex items-center justify-center gap-3 mt-10">
+            <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>← Prev</Button>
+            <span className="text-sm text-muted-foreground">Page {page} of {Math.ceil(total / 9)}</span>
+            <Button variant="outline" size="sm" disabled={page >= Math.ceil(total / 9)} onClick={() => setPage((p) => p + 1)}>Next →</Button>
+          </div>
+        )}
       </div>
-    </div>
-  )
+
+      {/* Detail modal */}
+      {selected && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setSelected(null)}>
+          <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} onClick={(e) => e.stopPropagation()}
+            className="bg-card border border-border rounded-2xl max-w-xl w-full max-h-[85vh] overflow-y-auto shadow-2xl"
+          >
+            {selected.image_url && (
+              <div className="relative h-56 bg-muted"><Image src={selected.image_url} alt={selected.project_name} fill className="object-cover rounded-t-2xl" /></div>
+            )}
+            <div className="p-6 space-y-4">
+              <div className="flex items-start justify-between gap-3">
+                <h2 className="text-xl font-bold text-foreground">{selected.project_name}</h2>
+                <Badge variant="outline" className="capitalize flex-shrink-0">{selected.portfolio_type}</Badge>
+              </div>
+              {selected.client_name && <p className="text-sm text-muted-foreground">Client: <span className="font-medium text-foreground">{selected.client_name}</span></p>}
+              <p className="text-sm text-muted-foreground leading-relaxed">{selected.description}</p>
+              {selected.language_used && (
+                <div className="flex flex-wrap gap-1.5">{selected.language_used.map((l) => <Badge key={l} variant="secondary" className="text-xs">{l}</Badge>)}</div>
+              )}
+              <div className="flex items-center gap-3 pt-2">
+                {selected.project_link && (
+                  <a href={selected.project_link} target="_blank" rel="noreferrer">
+                    <Button size="sm" className="gap-1.5 bg-blue-600 hover:bg-blue-700"><ExternalLink className="w-3.5 h-3.5" /> Live Demo</Button>
+                  </a>
+                )}
+                {selected.github_link && (
+                  <a href={selected.github_link} target="_blank" rel="noreferrer">
+                    <Button size="sm" variant="outline" className="gap-1.5"><Github className="w-3.5 h-3.5" /> GitHub</Button>
+                  </a>
+                )}
+                <Button size="sm" variant="ghost" onClick={() => setSelected(null)} className="ml-auto">Close</Button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </section>
+  );
 }
