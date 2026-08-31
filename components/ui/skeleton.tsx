@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { cn } from './motion';
 
 interface SkeletonProps {
@@ -24,12 +23,9 @@ export function Skeleton({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0.5 }}
-      animate={{ opacity: 0.5 }}
-      transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
+    <div
       className={cn(
-        'bg-gray-200 dark:bg-gray-700',
+        'animate-pulse bg-gray-200 dark:bg-gray-700',
         variantClasses[variant],
         className
       )}
