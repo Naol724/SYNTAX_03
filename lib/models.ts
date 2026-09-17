@@ -10,8 +10,12 @@ const AdminUserSchema = new mongoose.Schema({
 })
 
 AdminUserSchema.methods.comparePassword = async function (password: string) {
-  // In production, use bcrypt for password hashing
-  return this.password === password
+  const stored: string = this.password || ""
+  if (stored.startsWith("$2a$") || stored.startsWith("$2b$") || stored.startsWith("$2y$")) {
+    const bcrypt = await import("bcryptjs")
+    return bcrypt.compare(password, stored)
+  }
+  return stored === password
 }
 
 // Booking Model

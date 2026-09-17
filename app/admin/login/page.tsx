@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { toast } from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { Mail, Lock, LogIn, Loader2, Eye, EyeOff, Code2 } from 'lucide-react';
 import Link from 'next/link';
-import api, { setToken, setRefreshToken } from '@/lib/api';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -21,17 +21,24 @@ export default function AdminLoginPage() {
     setError('');
 
     try {
-      const data = await api.auth.login(formData.email, formData.password);
-      setToken(data.accessToken);
-      setRefreshToken(data.refreshToken);
+      const result = await signIn('credentials', {
+        email: formData.email.trim(),
+        password: formData.password,
+        redirect: false,
+      });
 
-      // Set cookie for middleware (edge-compatible)
-      document.cookie = `syntax_token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`;
+      if (result?.error) {
+        const msg = 'Invalid email or password';
+        setError(msg);
+        toast.error(msg);
+        return;
+      }
 
-      toast.success(`Welcome back, ${data.admin?.full_name ?? 'Admin'}!`);
+      toast.success('Welcome back!');
       router.push('/admin/dashboard');
-    } catch (err: any) {
-      const msg = err?.message ?? 'Invalid email or password';
+      router.refresh();
+    } catch {
+      const msg = 'Unable to sign in. Please try again.';
       setError(msg);
       toast.error(msg);
     } finally {
@@ -41,7 +48,6 @@ export default function AdminLoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 relative overflow-hidden">
-      {/* Animated blobs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-3xl animate-pulse" />
         <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] bg-indigo-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
@@ -57,7 +63,6 @@ export default function AdminLoginPage() {
         className="relative z-10 w-full max-w-md mx-4"
       >
         <div className="bg-white/[0.07] backdrop-blur-2xl rounded-3xl p-8 border border-white/10 shadow-2xl shadow-black/40">
-          {/* Logo */}
           <div className="text-center mb-8">
             <motion.div
               initial={{ scale: 0.8 }}
@@ -71,7 +76,6 @@ export default function AdminLoginPage() {
             <p className="text-blue-300/80 text-sm mt-1">Syntax Software Solutions</p>
           </div>
 
-          {/* Error */}
           {error && (
             <motion.div
               initial={{ opacity: 0, y: -6 }}
@@ -93,7 +97,8 @@ export default function AdminLoginPage() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full pl-11 pr-4 py-3 bg-white/[0.07] border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500/40 transition-all text-sm"
-                  placeholder="admin@syntax.com"
+                  placeholder="admin@syntaxsoftwaresolution.com"
+                  autoComplete="email"
                 />
               </div>
             </div>
@@ -109,6 +114,7 @@ export default function AdminLoginPage() {
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   className="w-full pl-11 pr-11 py-3 bg-white/[0.07] border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500/40 transition-all text-sm"
                   placeholder="••••••••"
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"

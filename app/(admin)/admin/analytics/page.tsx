@@ -2,140 +2,129 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
-import { Eye, Users, FileText, MessageSquare, Briefcase, FolderKanban, Loader2 } from "lucide-react";
-import api from "@/lib/api";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
+} from "recharts";
+import { Eye, Users, FileText, MessageSquare, Briefcase, FolderKanban, Loader2, Mail } from "lucide-react";
 
 export default function AnalyticsPage() {
   const [stats, setStats] = useState<any>(null);
+  const [dailyData, setDailyData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.dashboard.getStats().then(setStats).catch(console.error).finally(() => setLoading(false));
+    fetch("/api/admin/stats")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data?.stats) setStats(data.stats);
+        if (data?.dailyData) setDailyData(data.dailyData);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return (
-    <div className="flex items-center justify-center py-24"><Loader2 className="w-6 h-6 animate-spin text-blue-500" /></div>
-  );
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+      </div>
+    );
+  }
 
   const s = stats ?? {};
 
   const contentData = [
     { name: "Services", value: s.totalServices ?? 0, color: "#3b82f6" },
     { name: "Portfolio", value: s.totalPortfolio ?? 0, color: "#6366f1" },
-    { name: "Blog Posts", value: s.totalBlogs ?? 0, color: "#8b5cf6" },
+    { name: "Blog Posts", value: s.totalBlogPosts ?? 0, color: "#8b5cf6" },
     { name: "Testimonials", value: s.totalTestimonials ?? 0, color: "#ec4899" },
-    { name: "Team", value: s.totalDevelopers ?? 0, color: "#f59e0b" },
-    { name: "Users", value: s.totalUsers ?? 0, color: "#10b981" },
-  ];
-
-  const messageData = [
-    { name: "Unread", value: s.unreadMessages ?? 0, color: "#3b82f6" },
-    { name: "Read", value: (s.totalMessages ?? 0) - (s.unreadMessages ?? 0) - (s.urgentMessages ?? 0), color: "#6b7280" },
-    { name: "Urgent", value: s.urgentMessages ?? 0, color: "#ef4444" },
+    { name: "Messages", value: s.totalContactMessages ?? 0, color: "#10b981" },
+    { name: "Leads", value: s.totalLeads ?? 0, color: "#f59e0b" },
   ];
 
   const statCards = [
     { label: "Total Views", value: (s.totalViews ?? 0).toLocaleString(), icon: Eye, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30" },
-    { label: "Registered Users", value: s.totalUsers ?? 0, icon: Users, color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950/30" },
-    { label: "Blog Posts", value: s.totalBlogs ?? 0, icon: FileText, color: "text-violet-500", bg: "bg-violet-50 dark:bg-violet-950/30" },
-    { label: "Total Messages", value: s.totalMessages ?? 0, icon: MessageSquare, color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-950/30" },
-    { label: "Services", value: s.totalServices ?? 0, icon: Briefcase, color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30" },
-    { label: "Portfolio Items", value: s.totalPortfolio ?? 0, icon: FolderKanban, color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
+    { label: "Unique Visitors", value: (s.uniqueVisitors ?? 0).toLocaleString(), icon: Users, color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950/30" },
+    { label: "Blog Posts", value: s.totalBlogPosts ?? 0, icon: FileText, color: "text-violet-500", bg: "bg-violet-50 dark:bg-violet-950/30" },
+    { label: "Messages", value: s.totalContactMessages ?? 0, icon: Mail, color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-950/30" },
+    { label: "Services", value: s.totalServices ?? 0, icon: Briefcase, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30" },
+    { label: "Portfolio", value: s.totalPortfolio ?? 0, icon: FolderKanban, color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950/30" },
+    { label: "Testimonials", value: s.totalTestimonials ?? 0, icon: MessageSquare, color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
+    { label: "Bookings", value: s.totalBookings ?? 0, icon: Users, color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30" },
   ];
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics</h1>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">Website performance and content overview</p>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">Website performance metrics</p>
       </div>
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {statCards.map((c) => (
-          <Card key={c.label} className="border-gray-200 dark:border-slate-800">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {statCards.map((card) => (
+          <Card key={card.label} className="border-gray-200 dark:border-slate-800">
             <CardContent className="p-4">
-              <div className={`w-9 h-9 rounded-xl ${c.bg} flex items-center justify-center mb-3`}>
-                <c.icon className={`w-4.5 h-4.5 ${c.color}`} />
+              <div className={`w-9 h-9 rounded-xl ${card.bg} flex items-center justify-center mb-3`}>
+                <card.icon className={`w-4.5 h-4.5 ${card.color}`} />
               </div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{c.value}</p>
-              <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-0.5">{c.label}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{card.value}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{card.label}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Content distribution bar chart */}
         <Card className="border-gray-200 dark:border-slate-800">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold">Content Distribution</CardTitle>
+          <CardHeader>
+            <CardTitle className="text-sm">Content Overview</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={contentData} barSize={32}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
-                <Tooltip contentStyle={{ borderRadius: "10px", border: "1px solid var(--border)", background: "var(--card)", color: "var(--card-foreground)", fontSize: 12 }} />
-                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                  {contentData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                </Bar>
+            <ResponsiveContainer width="100%" height={260}>
+              <PieChart>
+                <Pie
+                  data={contentData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={90}
+                  label={({ name, value }) => `${name}: ${value}`}
+                >
+                  {contentData.map((entry) => (
+                    <Cell key={entry.name} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="border-gray-200 dark:border-slate-800">
+          <CardHeader>
+            <CardTitle className="text-sm">Daily Traffic (7 days)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={dailyData}>
+                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                <XAxis
+                  dataKey="date"
+                  tickFormatter={(d) =>
+                    new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                  }
+                  fontSize={11}
+                />
+                <YAxis fontSize={11} />
+                <Tooltip />
+                <Bar dataKey="pageViews" fill="#3b82f6" name="Page Views" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="uniqueVisitors" fill="#10b981" name="Visitors" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
-
-        {/* Messages pie chart */}
-        <Card className="border-gray-200 dark:border-slate-800">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold">Message Status</CardTitle>
-          </CardHeader>
-          <CardContent className="flex items-center gap-6">
-            <ResponsiveContainer width="50%" height={180}>
-              <PieChart>
-                <Pie data={messageData} dataKey="value" cx="50%" cy="50%" innerRadius={40} outerRadius={70} paddingAngle={4}>
-                  {messageData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                </Pie>
-                <Tooltip contentStyle={{ borderRadius: "10px", border: "1px solid var(--border)", background: "var(--card)", color: "var(--card-foreground)", fontSize: 12 }} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="space-y-2.5 flex-1">
-              {messageData.map((item) => (
-                <div key={item.name} className="flex items-center gap-2.5">
-                  <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: item.color }} />
-                  <span className="text-xs text-gray-600 dark:text-slate-400 flex-1">{item.name}</span>
-                  <span className="text-sm font-bold text-gray-900 dark:text-white">{item.value}</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
-
-      {/* Recent activity timeline */}
-      {s.recentActivity?.length > 0 && (
-        <Card className="border-gray-200 dark:border-slate-800">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold">Recent Activity Timeline</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {s.recentActivity.slice(0, 8).map((item: any) => (
-                <div key={item.activity_id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800/50">
-                  <div className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-900 dark:text-white truncate">{item.title}</p>
-                    <p className="text-[11px] text-gray-400 capitalize">{item.activity_type}</p>
-                  </div>
-                  <span className="text-[11px] text-gray-400 flex-shrink-0">{new Date(item.created_at).toLocaleDateString()}</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

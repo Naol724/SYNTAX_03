@@ -23,6 +23,10 @@ services:
         generateValue: true
       - key: NEXTAUTH_URL
         sync: false
+      - key: ADMIN_EMAIL
+        value: admin@syntaxsoftwaresolution.com
+      - key: ADMIN_PASSWORD
+        sync: false
       - key: GEMINI_API_KEY
         sync: false
       - key: EMAIL_HOST
@@ -35,5 +39,3 @@ services:
         sync: false
       - key: EMAIL_PASSWORD
         sync: false
-      - key: ADMIN_EMAIL
-        value: syntaxsoftwaresolution@gmail.com

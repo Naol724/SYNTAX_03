@@ -2,16 +2,16 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Briefcase, FolderKanban, FileText,
   MessageSquare, Users, Mail, BarChart3, LogOut,
-  Menu, X, Code2, Bell, ChevronRight, Sun, Moon,
+  Menu, ChevronRight, Sun, Moon, Code2, Bell, ArrowLeft, ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import api, { clearTokens } from "@/lib/api";
 import { toast } from "react-hot-toast";
 
 const NAV = [
@@ -25,35 +25,23 @@ const NAV = [
   { href: "/admin/analytics",    label: "Analytics",    icon: BarChart3 },
 ];
 
-interface AdminInfo {
-  full_name: string;
-  email: string;
-  role: string;
-}
-
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [admin, setAdmin] = useState<AdminInfo | null>(null);
   const [unread, setUnread] = useState(0);
   const [dark, setDark] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
+  const { data: session } = useSession();
 
-  // Load admin info
   useEffect(() => {
-    api.auth.me()
-      .then((d: any) => setAdmin(d))
-      .catch(() => router.push("/admin/login"));
-  }, [router]);
-
-  // Load unread message count
-  useEffect(() => {
-    api.messages.getStats()
-      .then((s: any) => setUnread(s?.unread_count ?? 0))
+    fetch("/api/admin/messages?limit=50")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data?.total != null) setUnread(data.total);
+        else if (Array.isArray(data?.messages)) setUnread(data.messages.length);
+      })
       .catch(() => {});
   }, [pathname]);
 
-  // Dark mode toggle
   useEffect(() => {
     const stored = localStorage.getItem("syntax-theme");
     if (stored === "dark" || (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
@@ -70,21 +58,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   const handleLogout = async () => {
-    try {
-      await api.auth.logout();
-    } finally {
-      clearTokens();
-      document.cookie = "syntax_token=; path=/; max-age=0";
-      toast.success("Logged out");
-      router.push("/admin/login");
-    }
+    await signOut({ callbackUrl: "/admin/login" });
+    toast.success("Logged out");
   };
 
-  const initials = admin?.full_name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() ?? "A";
+  const displayName = session?.user?.name || "Admin";
+  const displayEmail = session?.user?.email || "";
+  const initials =
+    displayName
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "A";
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex">
-      {/* Mobile backdrop */}
       <AnimatePresence>
         {sidebarOpen && (
           <motion.div
@@ -95,14 +84,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         )}
       </AnimatePresence>
 
-      {/* ── SIDEBAR ── */}
       <aside className={`
         fixed top-0 left-0 z-50 h-full w-64 flex flex-col
         bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800
         transform transition-transform duration-300 lg:translate-x-0
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
       `}>
-        {/* Logo */}
         <div className="p-5 border-b border-gray-200 dark:border-slate-800">
           <Link href="/admin/dashboard" className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/30">
@@ -115,7 +102,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </Link>
         </div>
 
-        {/* Nav */}
         <nav className="flex-1 overflow-y-auto p-3 space-y-0.5">
           {NAV.map(({ href, label, icon: Icon, badge }) => {
             const active = pathname.startsWith(href);
@@ -141,32 +127,33 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
 
-        {/* User area */}
         <div className="p-3 border-t border-gray-200 dark:border-slate-800 space-y-2">
           <div className="flex items-center gap-3 px-2 py-1.5">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
               {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">{admin?.full_name ?? "Admin"}</p>
-              <p className="text-[10px] text-gray-500 dark:text-slate-400 truncate">{admin?.email}</p>
+              <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">{displayName}</p>
+              <p className="text-[10px] text-gray-500 dark:text-slate-400 truncate">{displayEmail}</p>
             </div>
           </div>
+          <Link href="/" onClick={() => setSidebarOpen(false)}>
+            <Button variant="outline" size="sm" className="w-full text-xs h-8 gap-2 mb-1.5 border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-950/40">
+              <ArrowLeft className="w-3.5 h-3.5" /> Back to Website
+            </Button>
+          </Link>
           <Button variant="outline" size="sm" onClick={handleLogout} className="w-full text-xs h-8 gap-2">
             <LogOut className="w-3.5 h-3.5" /> Sign Out
           </Button>
         </div>
       </aside>
 
-      {/* ── MAIN ── */}
       <div className="flex-1 lg:pl-64 flex flex-col min-h-screen">
-        {/* Top bar */}
         <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
           <Button variant="ghost" size="icon" className="lg:hidden h-8 w-8" onClick={() => setSidebarOpen(true)}>
             <Menu className="w-5 h-5" />
           </Button>
 
-          {/* Breadcrumb */}
           <div className="hidden lg:flex items-center gap-1.5 text-sm text-gray-500 dark:text-slate-400">
             <span>Admin</span>
             <ChevronRight className="w-3.5 h-3.5" />
@@ -176,11 +163,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           <div className="flex items-center gap-2 ml-auto">
-            {/* Dark mode */}
+            <Link href="/">
+              <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5 border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-950/40">
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Back to Website</span>
+                <span className="sm:hidden">Back</span>
+              </Button>
+            </Link>
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggleDark}>
               {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
-            {/* Notifications */}
             <Link href="/admin/messages">
               <Button variant="ghost" size="icon" className="h-8 w-8 relative">
                 <Bell className="w-4 h-4" />
@@ -189,16 +181,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 )}
               </Button>
             </Link>
-            {/* View site */}
             <Link href="/" target="_blank">
-              <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5 hidden sm:flex">
-                View Site
+              <Button variant="ghost" size="sm" className="h-8 text-xs gap-1.5 hidden md:flex">
+                <ExternalLink className="w-3.5 h-3.5" /> Open Site
               </Button>
             </Link>
           </div>
         </header>
 
-        {/* Page */}
         <main className="flex-1 p-4 sm:p-6">
           {children}
         </main>
