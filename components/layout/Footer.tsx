@@ -10,18 +10,20 @@ const quickLinks = [
   { href: "/about", label: "About Us" },
   { href: "/services", label: "Services" },
   { href: "/projects", label: "Projects" },
+  { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
 ];
 
+/** Static links — avoids an API round-trip on every page navigation */
 const services = [
-  { href: "/services#website", label: "Website Development" },
-  { href: "/services#mobile", label: "Mobile Applications" },
-  { href: "/services#gaming", label: "Gaming Platforms" },
-  { href: "/services#enterprise", label: "Enterprise Systems" },
-  { href: "/services#bots", label: "Bot Development" },
-  { href: "/services#cloud", label: "Cloud & DevOps" },
-  { href: "/services#design", label: "UI/UX Design" },
-  { href: "/services#support", label: "Support & Maintenance" },
+  { href: "/services", label: "Website Development" },
+  { href: "/services", label: "Mobile Applications" },
+  { href: "/services", label: "Gaming Platforms" },
+  { href: "/services", label: "Enterprise Systems" },
+  { href: "/services", label: "Bot Development" },
+  { href: "/services", label: "Cloud & DevOps" },
+  { href: "/services", label: "UI/UX Design" },
+  { href: "/services", label: "Support & Maintenance" },
 ];
 
 /**

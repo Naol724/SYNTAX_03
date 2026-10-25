@@ -31,7 +31,7 @@
   --input: hsl(214 32% 91%);
   --ring: hsl(217 91% 60%);
   --radius: 0.625rem;
-  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   --brand-50:  hsl(214 100% 97%);
   --brand-100: hsl(214 95% 93%);

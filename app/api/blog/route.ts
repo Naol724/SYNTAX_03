@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import { connectToDatabase } from "@/lib/mongoose"
-import { BlogPost } from "@/lib/models"
+import { createResource, listResource, getActiveStoreInfo } from "@/lib/content-repo"
+import { slugify } from "@/lib/admin-api"
 
-// GET all blog posts (admin)
+export const dynamic = "force-dynamic"
+
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -12,33 +13,44 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    await connectToDatabase()
-
     const { searchParams } = new URL(req.url)
     const published = searchParams.get("published")
+    const search = searchParams.get("search")
     const page = parseInt(searchParams.get("page") || "1")
-    const limit = parseInt(searchParams.get("limit") || "10")
+    const limit = parseInt(searchParams.get("limit") || "50")
 
-    const query: any = {}
-    if (published) query.published = published === "true"
+    let posts = await listResource("blog")
 
-    const posts = await BlogPost.find(query)
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit)
+    if (published === "true") posts = posts.filter((p: any) => p.published)
+    if (published === "false") posts = posts.filter((p: any) => !p.published)
 
-    const total = await BlogPost.countDocuments(query)
+    if (search?.trim()) {
+      const q = search.trim().toLowerCase()
+      posts = posts.filter(
+        (p: any) =>
+          String(p.title || "").toLowerCase().includes(q) ||
+          String(p.excerpt || "").toLowerCase().includes(q)
+      )
+    }
+
+    const total = posts.length
+    const sliced = posts.slice((page - 1) * limit, page * limit)
 
     return NextResponse.json({
-      posts,
-      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+      posts: sliced,
+      total,
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) || 1 },
+      store: getActiveStoreInfo(),
     })
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch posts" }, { status: 500 })
+  } catch (error: any) {
+    console.error("Blog GET error:", error)
+    return NextResponse.json(
+      { error: error?.message || "Failed to fetch posts" },
+      { status: 500 }
+    )
   }
 }
 
-// POST new blog post (admin)
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -46,13 +58,37 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    await connectToDatabase()
-
     const body = await req.json()
-    const post = await BlogPost.create(body)
+
+    if (!body.title?.trim() || !body.content?.trim()) {
+      return NextResponse.json(
+        { error: "Title and content are required" },
+        { status: 400 }
+      )
+    }
+
+    const slug = body.slug?.trim() || slugify(body.title)
+
+    const post = await createResource("blog", {
+      title: body.title.trim(),
+      slug,
+      excerpt: body.excerpt || "",
+      content: body.content.trim(),
+      featuredImage: body.featuredImage || "",
+      category: body.category || "",
+      tags: Array.isArray(body.tags) ? body.tags : [],
+      author: body.author || session.user?.name || "Admin",
+      published: !!body.published,
+      featured: !!body.featured,
+      views: 0,
+    })
 
     return NextResponse.json(post, { status: 201 })
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to create post" }, { status: 500 })
+  } catch (error: any) {
+    console.error("Blog POST error:", error)
+    return NextResponse.json(
+      { error: error?.message || "Failed to create post" },
+      { status: 500 }
+    )
   }
 }

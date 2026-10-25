@@ -1,46 +1,50 @@
 import { NextRequest, NextResponse } from "next/server"
-import { connectToDatabase } from "@/lib/mongoose"
-import { BlogPost, Comment } from "@/lib/models"
+import { listResource, updateResource } from "@/lib/content-repo"
+
+export const dynamic = "force-dynamic"
 
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: { slug: string } }
 ) {
   try {
-    await connectToDatabase()
+    const posts = await listResource("blog")
+    const post = posts.find(
+      (p: any) => p.slug === params.slug && p.published
+    )
 
-    const post = await BlogPost.findOne({ slug: params.slug, published: true })
     if (!post) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 })
     }
 
-    // Increment views
-    await BlogPost.findByIdAndUpdate(post._id, { $inc: { views: 1 } })
+    // Best-effort view increment
+    try {
+      await updateResource("blog", String(post._id), {
+        views: Number(post.views || 0) + 1,
+      })
+    } catch {
+      /* ignore */
+    }
 
-    // Get related posts
-    const relatedPosts = await BlogPost.find({
-      _id: { $ne: post._id },
-      published: true,
-      $or: [
-        { category: post.category },
-        { tags: { $in: post.tags } },
-      ],
-    })
-      .limit(4)
-      .sort({ createdAt: -1 })
-
-    // Get comments
-    const comments = await Comment.find({
-      postId: post._id,
-      approved: true,
-    }).sort({ createdAt: -1 })
+    const relatedPosts = posts
+      .filter(
+        (p: any) =>
+          p.published &&
+          p._id !== post._id &&
+          (p.category === post.category ||
+            (Array.isArray(p.tags) &&
+              Array.isArray(post.tags) &&
+              p.tags.some((t: string) => post.tags.includes(t))))
+      )
+      .slice(0, 4)
 
     return NextResponse.json({
-      post,
+      post: { ...post, views: Number(post.views || 0) + 1 },
       relatedPosts,
-      comments,
+      comments: [],
     })
   } catch (error) {
+    console.error("Public blog slug error:", error)
     return NextResponse.json({ error: "Failed to fetch post" }, { status: 500 })
   }
 }

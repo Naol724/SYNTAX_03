@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "react-hot-toast";
-import api from "@/lib/api";
 
 const schema = z.object({
   sender_name: z.string().min(2, "Name must be at least 2 characters"),
@@ -36,7 +35,21 @@ export default function ContactPageClient() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await api.messages.send(data);
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.sender_name,
+          email: data.sender_email,
+          phone: data.sender_phone || undefined,
+          subject: data.subject,
+          message: data.message,
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || json.success === false) {
+        throw new Error(json.message || "Failed to send message");
+      }
       setSubmitted(true);
       reset();
       toast.success("Message sent! We'll get back to you soon.");

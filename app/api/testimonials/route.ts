@@ -1,28 +1,32 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import { connectToDatabase } from "@/lib/mongoose"
-import { Testimonial } from "@/lib/models"
+import { createResource, listResource, getActiveStoreInfo } from "@/lib/content-repo"
 
-// GET all testimonials (admin)
-export async function GET(req: NextRequest) {
+export const dynamic = "force-dynamic"
+
+export async function GET() {
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    await connectToDatabase()
-
-    const testimonials = await Testimonial.find().sort({ order: 1, createdAt: -1 })
-
-    return NextResponse.json({ testimonials })
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch testimonials" }, { status: 500 })
+    const testimonials = await listResource("testimonials")
+    return NextResponse.json({
+      testimonials,
+      total: testimonials.length,
+      store: getActiveStoreInfo(),
+    })
+  } catch (error: any) {
+    console.error("Testimonials GET error:", error)
+    return NextResponse.json(
+      { error: error?.message || "Failed to fetch testimonials" },
+      { status: 500 }
+    )
   }
 }
 
-// POST new testimonial (admin)
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -30,13 +34,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    await connectToDatabase()
-
     const body = await req.json()
-    const testimonial = await Testimonial.create(body)
+
+    if (!body.name?.trim() || !body.content?.trim()) {
+      return NextResponse.json(
+        { error: "Name and feedback content are required" },
+        { status: 400 }
+      )
+    }
+
+    const testimonial = await createResource("testimonials", {
+      name: body.name.trim(),
+      company: body.company || "",
+      content: body.content.trim(),
+      rating: Math.min(5, Math.max(1, Number(body.rating) || 5)),
+      image: body.image || "",
+      active: body.active !== false,
+      featured: !!body.featured,
+      order: Number(body.order) || 0,
+    })
 
     return NextResponse.json(testimonial, { status: 201 })
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to create testimonial" }, { status: 500 })
+  } catch (error: any) {
+    console.error("Testimonials POST error:", error)
+    return NextResponse.json(
+      { error: error?.message || "Failed to create testimonial" },
+      { status: 500 }
+    )
   }
 }

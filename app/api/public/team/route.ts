@@ -1,15 +1,20 @@
-import { NextRequest, NextResponse } from "next/server"
-import { connectToDatabase } from "@/lib/mongoose"
-import { TeamMember } from "@/lib/models"
+import { NextResponse } from "next/server"
+import { listResource } from "@/lib/content-repo"
 
-export async function GET(req: NextRequest) {
+export const dynamic = "force-dynamic"
+
+export async function GET() {
   try {
-    await connectToDatabase()
-
-    const teamMembers = await TeamMember.find({ active: true })
-      .sort({ order: 1, createdAt: -1 })
-
-    return NextResponse.json({ teamMembers })
+    let teamMembers = await listResource("team")
+    teamMembers = teamMembers.filter((m: any) => m.active !== false)
+    return NextResponse.json(
+      { teamMembers },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=15, stale-while-revalidate=60",
+        },
+      }
+    )
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch team members" }, { status: 500 })
   }

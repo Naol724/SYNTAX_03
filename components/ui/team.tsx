@@ -1,72 +1,38 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Linkedin, Github, Mail, ArrowUpRight } from 'lucide-react';
+import { Linkedin, Github, Mail, ArrowUpRight, Loader2 } from 'lucide-react';
 import { cn } from './motion';
+import { initialsFromName, usePublicList } from '@/lib/use-public-content';
 
-interface TeamMember {
+type ApiMember = {
+  _id: string;
   name: string;
   role: string;
-  bio: string;
-  initials: string;
-  gradient: string;
+  bio?: string;
+  image?: string;
+  email?: string;
   linkedin?: string;
   github?: string;
-  email?: string;
-}
+  active?: boolean;
+};
 
 interface TeamGridProps {
   columns?: 2 | 3 | 4 | 5;
   showFullTeam?: boolean;
 }
 
-const teamMembers: TeamMember[] = [
-  {
-    name: 'Nathenal Teklay',
-    role: 'Co-Founder & CEO',
-    bio: 'Leads business strategy, vision, and client relationships. Passionate about building Ethiopia\'s tech ecosystem.',
-    initials: 'NT',
-    gradient: 'from-blue-500 to-blue-700',
-    linkedin: 'https://linkedin.com/in/nathenaltek',
-    email: 'mailto:nathenal@syntax.et',
-  },
-  {
-    name: 'Leulseged Lemma',
-    role: 'Co-Founder & CTO',
-    bio: 'Oversees technical architecture and engineering standards. Full-stack expert with 10+ years experience.',
-    initials: 'LL',
-    gradient: 'from-indigo-500 to-indigo-700',
-    linkedin: 'https://linkedin.com/in/leulsegedlemma',
-    github: 'https://github.com/leulseged',
-    email: 'mailto:leulseged@syntax.et',
-  },
-  {
-    name: 'Tsega',
-    role: 'Senior Developer',
-    bio: 'Full-stack expert in scalable web & enterprise platforms. Specializes in React, Node.js, and cloud architecture.',
-    initials: 'TS',
-    gradient: 'from-blue-600 to-indigo-600',
-    linkedin: 'https://linkedin.com/in/tsega',
-  },
-  {
-    name: 'Nati',
-    role: 'Senior Developer',
-    bio: 'Backend architect focused on API design & high-performance systems. PostgreSQL and microservices specialist.',
-    initials: 'NA',
-    gradient: 'from-indigo-500 to-blue-700',
-    github: 'https://github.com/nati',
-  },
-  {
-    name: 'Kiya',
-    role: 'Cybersecurity Specialist',
-    bio: 'Penetration testing, data protection & security audits. Certified security professional protecting client assets.',
-    initials: 'KI',
-    gradient: 'from-slate-600 to-blue-800',
-    linkedin: 'https://linkedin.com/in/kiya',
-  },
+const gradients = [
+  'from-blue-500 to-blue-700',
+  'from-indigo-500 to-indigo-700',
+  'from-blue-600 to-indigo-600',
+  'from-indigo-500 to-blue-700',
+  'from-slate-600 to-blue-800',
 ];
 
 export function TeamGrid({ columns = 5, showFullTeam = true }: TeamGridProps) {
+  const { items, loading } = usePublicList<ApiMember>('/api/public/team', 'teamMembers');
+
   const columnClasses = {
     2: 'grid-cols-1 sm:grid-cols-2',
     3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
@@ -74,13 +40,37 @@ export function TeamGrid({ columns = 5, showFullTeam = true }: TeamGridProps) {
     5: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-5',
   };
 
-  const displayMembers = showFullTeam ? teamMembers : teamMembers.slice(0, 4);
+  const members = items.map((m, i) => ({
+    id: m._id,
+    name: m.name,
+    role: m.role,
+    bio: m.bio || '',
+    initials: initialsFromName(m.name),
+    gradient: gradients[i % gradients.length],
+    linkedin: m.linkedin || undefined,
+    github: m.github || undefined,
+    email: m.email ? (m.email.startsWith('mailto:') ? m.email : `mailto:${m.email}`) : undefined,
+  }));
+
+  const displayMembers = showFullTeam ? members : members.slice(0, 4);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="w-7 h-7 animate-spin text-blue-500" />
+      </div>
+    );
+  }
+
+  if (!displayMembers.length) {
+    return <p className="text-center text-gray-500 py-8">No team members yet.</p>;
+  }
 
   return (
     <div className={`grid ${columnClasses[columns]} gap-6`}>
       {displayMembers.map((member, index) => (
         <motion.div
-          key={member.name}
+          key={member.id}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -88,7 +78,6 @@ export function TeamGrid({ columns = 5, showFullTeam = true }: TeamGridProps) {
           className="group"
         >
           <div className="relative p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-            {/* Avatar */}
             <div className="flex justify-center mb-5">
               <motion.div
                 className={cn(
@@ -102,7 +91,6 @@ export function TeamGrid({ columns = 5, showFullTeam = true }: TeamGridProps) {
               </motion.div>
             </div>
 
-            {/* Name & Role */}
             <div className="text-center mb-3">
               <h3 className="font-bold text-gray-900 dark:text-white">{member.name}</h3>
               <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-0.5">
@@ -110,12 +98,12 @@ export function TeamGrid({ columns = 5, showFullTeam = true }: TeamGridProps) {
               </p>
             </div>
 
-            {/* Bio */}
-            <p className="text-sm text-gray-500 dark:text-gray-400 text-center leading-relaxed mb-4">
-              {member.bio}
-            </p>
+            {member.bio ? (
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center leading-relaxed mb-4">
+                {member.bio}
+              </p>
+            ) : null}
 
-            {/* Social Links */}
             <div className="flex justify-center gap-2">
               {member.linkedin && (
                 <motion.a
@@ -153,7 +141,6 @@ export function TeamGrid({ columns = 5, showFullTeam = true }: TeamGridProps) {
               )}
             </div>
 
-            {/* Hover arrow */}
             <motion.div
               className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
               whileHover={{ scale: 1.1 }}
@@ -169,7 +156,6 @@ export function TeamGrid({ columns = 5, showFullTeam = true }: TeamGridProps) {
   );
 }
 
-// Team preview for home page
 export function TeamPreview() {
   return (
     <section className="py-20 bg-gray-50 dark:bg-gray-900">
@@ -180,9 +166,7 @@ export function TeamPreview() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <span className="section-label">
-            Our Team
-          </span>
+          <span className="section-label">Our Team</span>
           <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white mb-4">
             Meet the Experts
           </h2>

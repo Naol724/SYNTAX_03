@@ -43,3 +43,6 @@ Thumbs.db
 .temp
 .cache
 .vercel
+
+# Local file database (admin CRUD fallback when Mongo unavailable)
+.data/

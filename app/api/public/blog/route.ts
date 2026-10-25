@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
-import { connectToDatabase } from "@/lib/mongoose"
-import { BlogPost } from "@/lib/models"
+import { listResource } from "@/lib/content-repo"
+
+export const dynamic = "force-dynamic"
 
 export async function GET(req: NextRequest) {
   try {
-    await connectToDatabase()
-
     const { searchParams } = new URL(req.url)
     const category = searchParams.get("category")
     const featured = searchParams.get("featured")
@@ -13,27 +12,38 @@ export async function GET(req: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1")
     const limit = parseInt(searchParams.get("limit") || "10")
 
-    const query: any = { published: true }
-    if (category) query.category = category
-    if (featured === "true") query.featured = true
+    let posts = await listResource("blog")
+    posts = posts.filter((p: any) => p.published)
+
+    if (category) {
+      posts = posts.filter(
+        (p: any) => String(p.category || "").toLowerCase() === category.toLowerCase()
+      )
+    }
+    if (featured === "true") posts = posts.filter((p: any) => p.featured)
     if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { excerpt: { $regex: search, $options: "i" } },
-      ]
+      const q = search.toLowerCase()
+      posts = posts.filter(
+        (p: any) =>
+          String(p.title || "").toLowerCase().includes(q) ||
+          String(p.excerpt || "").toLowerCase().includes(q)
+      )
     }
 
-    const posts = await BlogPost.find(query)
-      .sort({ publishedAt: -1, createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit)
+    const total = posts.length
+    const sliced = posts.slice((page - 1) * limit, page * limit)
 
-    const total = await BlogPost.countDocuments(query)
-
-    return NextResponse.json({
-      posts,
-      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
-    })
+    return NextResponse.json(
+      {
+        posts: sliced,
+        pagination: { page, limit, total, pages: Math.ceil(total / limit) || 1 },
+      },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=15, stale-while-revalidate=60",
+        },
+      }
+    )
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch blog posts" }, { status: 500 })
   }

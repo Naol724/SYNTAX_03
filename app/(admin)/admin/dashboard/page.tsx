@@ -1,19 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Briefcase, FolderKanban, FileText, MessageSquare, Users, Mail, Eye, TrendingUp, Clock,
+  Briefcase, FolderKanban, FileText, MessageSquare, Users, Mail, Eye, TrendingUp, Clock, RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { adminFetch } from "@/lib/admin-api";
+import { Button } from "@/components/ui/button";
 
 interface Stats {
   totalServices: number;
   totalPortfolio: number;
   totalBlogPosts: number;
   totalTestimonials: number;
+  totalTeam: number;
   totalContactMessages: number;
   totalViews: number;
   totalBookings: number;
@@ -36,7 +39,7 @@ const STAT_CARDS = (s: Stats) => [
   { label: "Portfolio", value: s.totalPortfolio, icon: FolderKanban, color: "from-indigo-500 to-indigo-600", href: "/admin/portfolio" },
   { label: "Blog Posts", value: s.totalBlogPosts, icon: FileText, color: "from-violet-500 to-violet-600", href: "/admin/blog" },
   { label: "Testimonials", value: s.totalTestimonials, icon: MessageSquare, color: "from-purple-500 to-purple-600", href: "/admin/testimonials" },
-  { label: "Bookings", value: s.totalBookings, icon: Users, color: "from-pink-500 to-pink-600", href: "/admin/bookings" },
+  { label: "Team", value: s.totalTeam, icon: Users, color: "from-sky-500 to-sky-600", href: "/admin/developers" },
   { label: "Total Views", value: s.totalViews, icon: Eye, color: "from-cyan-500 to-cyan-600", href: "/admin/analytics" },
   {
     label: "Messages",
@@ -53,44 +56,48 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [recentMessages, setRecentMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const load = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
+    try {
+      const [statsData, messagesData] = await Promise.all([
+        adminFetch<{ stats: Partial<Stats>; recentMessages?: ContactMessage[] }>("/api/admin/stats"),
+        adminFetch<{ messages: ContactMessage[] }>("/api/admin/messages?limit=5").catch(() => ({
+          messages: [] as ContactMessage[],
+        })),
+      ]);
+
+      setStats({
+        totalServices: statsData.stats?.totalServices ?? 0,
+        totalPortfolio: statsData.stats?.totalPortfolio ?? 0,
+        totalBlogPosts: statsData.stats?.totalBlogPosts ?? 0,
+        totalTestimonials: statsData.stats?.totalTestimonials ?? 0,
+        totalTeam: statsData.stats?.totalTeam ?? 0,
+        totalContactMessages: statsData.stats?.totalContactMessages ?? 0,
+        totalViews: statsData.stats?.totalViews ?? 0,
+        totalBookings: statsData.stats?.totalBookings ?? 0,
+        totalLeads: statsData.stats?.totalLeads ?? 0,
+        pendingBookings: statsData.stats?.pendingBookings ?? 0,
+        newLeads: statsData.stats?.newLeads ?? 0,
+      });
+
+      const fromStats = statsData.recentMessages ?? [];
+      setRecentMessages(
+        (messagesData.messages?.length ? messagesData.messages : fromStats).slice(0, 5)
+      );
+    } catch (error) {
+      console.error("Failed to load dashboard:", error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const [statsRes, messagesRes] = await Promise.all([
-          fetch("/api/admin/stats"),
-          fetch("/api/admin/messages?limit=5"),
-        ]);
-
-        if (statsRes.ok) {
-          const statsData = await statsRes.json();
-          setStats({
-            totalServices: statsData.stats?.totalServices ?? 0,
-            totalPortfolio: statsData.stats?.totalPortfolio ?? 0,
-            totalBlogPosts: statsData.stats?.totalBlogPosts ?? 0,
-            totalTestimonials: statsData.stats?.totalTestimonials ?? 0,
-            totalContactMessages: statsData.stats?.totalContactMessages ?? 0,
-            totalViews: statsData.stats?.totalViews ?? 0,
-            totalBookings: statsData.stats?.totalBookings ?? 0,
-            totalLeads: statsData.stats?.totalLeads ?? 0,
-            pendingBookings: statsData.stats?.pendingBookings ?? 0,
-            newLeads: statsData.stats?.newLeads ?? 0,
-          });
-        }
-
-        if (messagesRes.ok) {
-          const messagesData = await messagesRes.json();
-          setRecentMessages(messagesData.messages ?? []);
-        }
-      } catch (error) {
-        console.error("Failed to load dashboard:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     load();
-  }, []);
+  }, [load]);
 
   if (loading) {
     return (
@@ -110,6 +117,7 @@ export default function DashboardPage() {
     totalPortfolio: 0,
     totalBlogPosts: 0,
     totalTestimonials: 0,
+    totalTeam: 0,
     totalContactMessages: 0,
     totalViews: 0,
     totalBookings: 0,
@@ -120,11 +128,24 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">
-          Overview of your website content and activity
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">
+            Overview of your website content and activity
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="gap-2"
+          disabled={refreshing}
+          onClick={() => load(true)}
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
+          Refresh
+        </Button>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

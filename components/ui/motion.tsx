@@ -168,16 +168,8 @@ interface PageTransitionProps {
 }
 
 export function PageTransition({ children, className }: PageTransitionProps) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.12, ease: 'easeOut' }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+  // No enter animation — keeps route changes feeling instant
+  return <div className={className}>{children}</div>;
 }
 
 // Hover card wrapper

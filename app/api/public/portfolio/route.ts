@@ -1,25 +1,34 @@
 import { NextRequest, NextResponse } from "next/server"
-import { connectToDatabase } from "@/lib/mongoose"
-import { Portfolio } from "@/lib/models"
+import { listResource } from "@/lib/content-repo"
+
+export const dynamic = "force-dynamic"
 
 export async function GET(req: NextRequest) {
   try {
-    await connectToDatabase()
-
     const { searchParams } = new URL(req.url)
     const category = searchParams.get("category")
     const featured = searchParams.get("featured")
-    const limit = parseInt(searchParams.get("limit") || "10")
+    const limit = parseInt(searchParams.get("limit") || "50")
 
-    const query: any = { active: true }
-    if (category) query.category = category
-    if (featured === "true") query.featured = true
+    let projects = await listResource("portfolio")
+    projects = projects.filter((p: any) => p.active !== false)
+    if (category) {
+      projects = projects.filter(
+        (p: any) => String(p.category || "").toLowerCase() === category.toLowerCase()
+      )
+    }
+    if (featured === "true") {
+      projects = projects.filter((p: any) => p.featured)
+    }
 
-    const projects = await Portfolio.find(query)
-      .sort({ order: 1, createdAt: -1 })
-      .limit(limit)
-
-    return NextResponse.json({ projects })
+    return NextResponse.json(
+      { projects: projects.slice(0, limit) },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=15, stale-while-revalidate=60",
+        },
+      }
+    )
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch portfolio" }, { status: 500 })
   }

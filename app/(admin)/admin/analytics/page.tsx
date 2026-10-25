@@ -13,7 +13,7 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/admin/stats")
+    fetch("/api/admin/stats", { credentials: "include", cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (data?.stats) setStats(data.stats);
@@ -38,8 +38,8 @@ export default function AnalyticsPage() {
     { name: "Portfolio", value: s.totalPortfolio ?? 0, color: "#6366f1" },
     { name: "Blog Posts", value: s.totalBlogPosts ?? 0, color: "#8b5cf6" },
     { name: "Testimonials", value: s.totalTestimonials ?? 0, color: "#ec4899" },
+    { name: "Team", value: s.totalTeam ?? 0, color: "#0ea5e9" },
     { name: "Messages", value: s.totalContactMessages ?? 0, color: "#10b981" },
-    { name: "Leads", value: s.totalLeads ?? 0, color: "#f59e0b" },
   ];
 
   const statCards = [
@@ -50,7 +50,7 @@ export default function AnalyticsPage() {
     { label: "Services", value: s.totalServices ?? 0, icon: Briefcase, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30" },
     { label: "Portfolio", value: s.totalPortfolio ?? 0, icon: FolderKanban, color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950/30" },
     { label: "Testimonials", value: s.totalTestimonials ?? 0, icon: MessageSquare, color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
-    { label: "Bookings", value: s.totalBookings ?? 0, icon: Users, color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30" },
+    { label: "Team", value: s.totalTeam ?? 0, icon: Users, color: "text-sky-500", bg: "bg-sky-50 dark:bg-sky-950/30" },
   ];
 
   return (

@@ -1,18 +1,8 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/providers";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { OrganizationStructuredData, WebSiteStructuredData } from "@/components/seo/StructuredData";
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-  variable: "--font-sans",
-});
-
-
 
 export const metadata: Metadata = {
 
@@ -128,8 +118,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} scroll-smooth`} suppressHydrationWarning>
-      <body className={`${inter.className} antialiased`}>
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <body className="font-sans antialiased">
         <OrganizationStructuredData
           name="Syntax Software Solutions"
           url="https://syntaxsoftwaresolution.com"

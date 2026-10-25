@@ -32,15 +32,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const { data: session } = useSession();
 
+  // Load message count once (not on every admin route change)
   useEffect(() => {
-    fetch("/api/admin/messages?limit=50")
+    fetch("/api/admin/messages?limit=1", { credentials: "include" })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (data?.total != null) setUnread(data.total);
         else if (Array.isArray(data?.messages)) setUnread(data.messages.length);
       })
       .catch(() => {});
-  }, [pathname]);
+  }, []);
 
   useEffect(() => {
     const stored = localStorage.getItem("syntax-theme");
