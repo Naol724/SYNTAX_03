@@ -40,6 +40,8 @@ Health check: `/api/health`
 
 ## 4. After deploy
 1. Open the live site and confirm pages navigate quickly.
-2. Log in at `/admin/login`.
-3. If Mongo is empty, run seed once locally against Atlas, or recreate content in admin.
+2. Log in at `/admin/login` and open **Dashboard** (or click **Refresh**) — empty collections auto-fill with the same services / projects / blog / testimonials / team shown on the public site.
+3. Optional: `POST /api/admin/seed` (while logged in) forces a sync.
 4. Send a test message from `/contact` and confirm it appears under Admin → Messages.
+
+**Important:** Public pages and admin both read the same store. If admin looked empty before, it was because production Mongo was empty while the marketing pages still showed built-in copy — seeding on deploy fixes that.

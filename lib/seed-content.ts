@@ -474,25 +474,83 @@ const DEFAULTS: Record<Resource, any[]> = {
 
 const seeded = new Set<Resource>()
 
-/** Seed a collection once if empty (file mode). Safe to call on every request. */
+function seedIntoFile(resource: Resource) {
+  if (fileStore.count(resource) > 0) return 0
+  for (const row of DEFAULTS[resource]) {
+    fileStore.create(resource, row)
+  }
+  console.log(`[seed] Seeded ${DEFAULTS[resource].length} ${resource} into .data/`)
+  return DEFAULTS[resource].length
+}
+
+/**
+ * Seed a collection if empty — works for both local file DB and MongoDB (production).
+ * Safe to call on every request; only writes when the collection has 0 documents.
+ */
 export async function ensureResourceSeeded(resource: Resource) {
   if (seeded.has(resource)) return
-  if (getStoreMode() !== "file") {
+
+  const defaults = DEFAULTS[resource]
+
+  if (getStoreMode() === "file") {
+    seedIntoFile(resource)
     seeded.add(resource)
     return
   }
 
-  if (fileStore.count(resource) === 0) {
-    for (const row of DEFAULTS[resource]) {
-      fileStore.create(resource, row)
+  try {
+    const { connectToDatabase } = await import("@/lib/mongoose")
+    const {
+      Service,
+      Portfolio,
+      BlogPost,
+      Testimonial,
+      TeamMember,
+    } = await import("@/lib/models")
+
+    const ModelMap = {
+      services: Service,
+      portfolio: Portfolio,
+      blog: BlogPost,
+      testimonials: Testimonial,
+      team: TeamMember,
+    } as const
+
+    await connectToDatabase()
+    const Model = ModelMap[resource]
+    const count = await Model.countDocuments()
+    if (count === 0) {
+      await Model.insertMany(defaults)
+      console.log(`[seed] Seeded ${defaults.length} ${resource} into MongoDB`)
     }
-    console.log(`[seed] Seeded ${DEFAULTS[resource].length} ${resource} into .data/`)
+    seeded.add(resource)
+  } catch (error) {
+    console.error(
+      `[seed] Mongo unavailable for ${resource}, seeding file fallback:`,
+      error
+    )
+    seedIntoFile(resource)
+    seeded.add(resource)
   }
-  seeded.add(resource)
 }
 
 export async function ensureAllSeeded() {
   for (const key of Object.keys(DEFAULTS) as Resource[]) {
     await ensureResourceSeeded(key)
+  }
+}
+
+/** Force re-check (e.g. after deploy) — clears in-memory "already seeded" flags. */
+export function resetSeedFlags() {
+  seeded.clear()
+}
+
+export function getDefaultCounts() {
+  return {
+    services: DEFAULT_SERVICES.length,
+    portfolio: DEFAULT_PORTFOLIO.length,
+    blog: DEFAULT_BLOG.length,
+    testimonials: DEFAULT_TESTIMONIALS.length,
+    team: DEFAULT_TEAM.length,
   }
 }

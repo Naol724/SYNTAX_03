@@ -15,7 +15,7 @@ services:
         value: production
       - key: NODE_VERSION
         value: "20.18.0"
-      # Set to false once a real Atlas URI is configured (recommended for production)
+      # false = MongoDB (recommended). Empty collections auto-seed on first request.
       - key: USE_FILE_DB
         value: "false"
       - key: MONGODB_URI

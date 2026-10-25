@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -57,11 +57,18 @@ export default function DashboardPage() {
   const [recentMessages, setRecentMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const didSeed = useRef(false);
 
   const load = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
     try {
+      // Sync empty DB with site defaults (needed after deploy so admin matches public pages)
+      if (isRefresh || !didSeed.current) {
+        await adminFetch("/api/admin/seed", { method: "POST" }).catch(() => null);
+        didSeed.current = true;
+      }
+
       const [statsData, messagesData] = await Promise.all([
         adminFetch<{ stats: Partial<Stats>; recentMessages?: ContactMessage[] }>("/api/admin/stats"),
         adminFetch<{ messages: ContactMessage[] }>("/api/admin/messages?limit=5").catch(() => ({

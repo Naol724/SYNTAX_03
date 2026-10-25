@@ -67,6 +67,10 @@ export async function listResource(resource: Resource, opts?: { bypassCache?: bo
       const Model = MODEL_MAP[resource]
       const docs = await Model.find().sort({ order: 1, createdAt: -1 }).lean()
       rows = docs.map((r: any) => ({ ...r, _id: String(r._id) }))
+      // If Mongo is empty but local file has seeded data, prefer that (deploy mismatch)
+      if (rows.length === 0 && fileStore.count(resource) > 0) {
+        rows = sortRows(resource, fileStore.list(resource))
+      }
     } catch (error) {
       console.error(`[content-repo] Mongo failed for ${resource}, using file store:`, error)
       rows = sortRows(resource, fileStore.list(resource))

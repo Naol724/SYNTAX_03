@@ -15,6 +15,7 @@ import { ContactCTA } from "@/components/ui/cta";
 import { ServicesMarquee } from "@/components/ui/services-marquee";
 import { TechLogos } from "@/components/ui/tech-logos";
 import { LocationMap } from "@/components/ui/location-map";
+import { usePublicList } from "@/lib/use-public-content";
 
 // Stats data
 const stats = [
@@ -42,17 +43,47 @@ const benefits = [
   { icon: "⚡", title: "Efficiency",     desc: "On-time delivery, no shortcuts" },
 ];
 
-// Featured projects
-const featuredProjects = [
-  { name: "Saron Orthopedic", category: "Healthcare", icon: "🏥", gradient: "from-red-500 to-pink-500" },
-  { name: "Dubai Furniture",  category: "E-Commerce", icon: "🛋️", gradient: "from-orange-500 to-amber-500" },
-  { name: "King Bingo",       category: "Gaming",     icon: "🎰", gradient: "from-green-500 to-emerald-500" },
+const PROJECT_GRADIENTS = [
+  "from-red-500 to-pink-500",
+  "from-orange-500 to-amber-500",
+  "from-green-500 to-emerald-500",
+  "from-blue-500 to-indigo-500",
+  "from-violet-500 to-purple-500",
 ];
+
+const emojiByCategory: Record<string, string> = {
+  Healthcare: "🏥",
+  Corporate: "🏢",
+  "E-Commerce": "🛋️",
+  EdTech: "📚",
+  Gaming: "🎰",
+  "Chatbot / Trading": "🤖",
+};
 
 // Shared viewport options — animates once, no repeated triggers
 const VP = { once: true, margin: "-60px" } as const;
 
 export default function Home() {
+  const { items: portfolioItems } = usePublicList<{
+    _id: string;
+    title: string;
+    category?: string;
+    featured?: boolean;
+  }>("/api/public/portfolio", "projects");
+
+  const featuredProjects = (portfolioItems.length
+    ? [...portfolioItems]
+        .sort((a, b) => Number(!!b.featured) - Number(!!a.featured))
+        .slice(0, 3)
+    : []
+  ).map((p, i) => ({
+    id: p._id,
+    name: p.title,
+    category: p.category || "Project",
+    icon: emojiByCategory[p.category || ""] || "💻",
+    gradient: PROJECT_GRADIENTS[i % PROJECT_GRADIENTS.length],
+  }));
+
   return (
     <>
       {/* ─── Hero ─────────────────────────────────────────────── */}
@@ -430,7 +461,7 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-10 sm:mb-16">
             {featuredProjects.map((project, index) => (
               <motion.div
-                key={project.name}
+                key={project.id || project.name}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={VP}

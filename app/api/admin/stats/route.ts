@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { listResource, getActiveStoreInfo } from "@/lib/content-repo"
+import { ensureAllSeeded } from "@/lib/seed-content"
 import { getContactMessageCount, getContactMessages } from "@/lib/storage"
 import { fileStore, getStoreMode } from "@/lib/file-store"
 import { connectToDatabase } from "@/lib/mongoose"
@@ -49,6 +50,9 @@ export async function GET() {
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
+
+    // Ensure deploy has the same default content as the public site when DB is empty
+    await ensureAllSeeded()
 
     const [services, portfolio, blog, testimonials, team, bookingLead, totalContactMessages] =
       await Promise.all([
