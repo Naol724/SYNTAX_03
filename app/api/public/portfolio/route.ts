@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from "next/server"
 import { listResource } from "@/lib/content-repo"
+import { syncResourceDefaults } from "@/lib/seed-content"
 
 export const dynamic = "force-dynamic"
 
 export async function GET(req: NextRequest) {
   try {
+    // Upgrade incomplete deploy catalogs (2 → 12 projects) before listing
+    await syncResourceDefaults("portfolio", { replace: false })
+
     const { searchParams } = new URL(req.url)
     const category = searchParams.get("category")
     const featured = searchParams.get("featured")
     const limit = parseInt(searchParams.get("limit") || "50")
 
-    let projects = await listResource("portfolio")
+    let projects = await listResource("portfolio", { bypassCache: true })
     projects = projects.filter((p: any) => p.active !== false)
     if (category) {
       projects = projects.filter(

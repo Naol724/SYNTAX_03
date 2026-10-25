@@ -25,7 +25,7 @@ See `.env.example` for the full list.
 ## 3. Push & deploy
 ```bash
 git add -A
-git commit -m "Perf + admin content sync + contact messages"
+git commit -m "Sync full content catalog to production"
 git push origin main
 ```
 Or in Render: **Manual Deploy** → **Deploy latest commit**.
@@ -38,10 +38,14 @@ Start command:
 
 Health check: `/api/health`
 
-## 4. After deploy
-1. Open the live site and confirm pages navigate quickly.
-2. Log in at `/admin/login` and open **Dashboard** (or click **Refresh**) — empty collections auto-fill with the same services / projects / blog / testimonials / team shown on the public site.
-3. Optional: `POST /api/admin/seed` (while logged in) forces a sync.
-4. Send a test message from `/contact` and confirm it appears under Admin → Messages.
+## 4. After deploy — make live match local
+Deployed Mongo often still has the **old tiny seed** (3 services, 2 projects). Local has the full catalog (**8 services, 12 projects**).
 
-**Important:** Public pages and admin both read the same store. If admin looked empty before, it was because production Mongo was empty while the marketing pages still showed built-in copy — seeding on deploy fixes that.
+1. **Push + Manual Deploy** this latest code on Render (required — old live code cannot fix the DB).
+2. Open this once (no login):  
+   **https://syntax-03.onrender.com/api/sync-content**  
+   You should see `"services": 8` and `"portfolio": 12` in the JSON.
+3. Or open **https://syntax-03.onrender.com/api/health** — check `counts`.
+4. Hard-refresh the website / admin.
+
+**Why health alone looked OK but data was wrong:** Mongo was connected (`store.mode: mongo`), but it still held the old 2/3-item seed. The upgrade runs only after this new code is deployed.

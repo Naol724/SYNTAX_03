@@ -474,63 +474,133 @@ const DEFAULTS: Record<Resource, any[]> = {
 
 const seeded = new Set<Resource>()
 
-function seedIntoFile(resource: Resource) {
-  if (fileStore.count(resource) > 0) return 0
-  for (const row of DEFAULTS[resource]) {
-    fileStore.create(resource, row)
+/** Bump this when default content grows — deploy will full-sync once. */
+export const CONTENT_SEED_VERSION = 3
+
+function itemKey(resource: Resource, row: any): string {
+  if (resource === "portfolio" || resource === "blog") {
+    return String(row.slug || row.title || "").toLowerCase()
   }
-  console.log(`[seed] Seeded ${DEFAULTS[resource].length} ${resource} into .data/`)
-  return DEFAULTS[resource].length
+  return String(row.name || "").toLowerCase()
+}
+
+function seedIntoFile(resource: Resource, replace = false) {
+  const defaults = DEFAULTS[resource]
+  if (replace) {
+    fileStore.clear(resource)
+    for (const row of defaults) fileStore.create(resource, row)
+    console.log(`[seed] Replaced file ${resource} with ${defaults.length} items`)
+    return defaults.length
+  }
+
+  const existing = fileStore.list(resource)
+  const have = new Set(existing.map((r: any) => itemKey(resource, r)))
+  let added = 0
+  for (const row of defaults) {
+    const key = itemKey(resource, row)
+    if (!key || have.has(key)) continue
+    fileStore.create(resource, row)
+    have.add(key)
+    added++
+  }
+  if (added > 0) {
+    console.log(`[seed] Added ${added} missing ${resource} into .data/ (now ${fileStore.count(resource)})`)
+  } else if (existing.length === 0) {
+    for (const row of defaults) fileStore.create(resource, row)
+    console.log(`[seed] Seeded ${defaults.length} ${resource} into .data/`)
+    return defaults.length
+  }
+  return added
+}
+
+async function getModelMap() {
+  const { connectToDatabase } = await import("@/lib/mongoose")
+  const {
+    Service,
+    Portfolio,
+    BlogPost,
+    Testimonial,
+    TeamMember,
+  } = await import("@/lib/models")
+  await connectToDatabase()
+  return {
+    services: Service,
+    portfolio: Portfolio,
+    blog: BlogPost,
+    testimonials: Testimonial,
+    team: TeamMember,
+  } as const
 }
 
 /**
- * Seed a collection if empty — works for both local file DB and MongoDB (production).
- * Safe to call on every request; only writes when the collection has 0 documents.
+ * Sync one resource with full site defaults.
+ * - replace=true → wipe collection and insert full local defaults (deploy = local)
+ * - replace=false → insert any missing defaults (keeps extra admin-created rows)
  */
-export async function ensureResourceSeeded(resource: Resource) {
-  if (seeded.has(resource)) return
-
+export async function syncResourceDefaults(
+  resource: Resource,
+  opts?: { replace?: boolean }
+) {
+  const replace = !!opts?.replace
   const defaults = DEFAULTS[resource]
 
   if (getStoreMode() === "file") {
-    seedIntoFile(resource)
+    seedIntoFile(resource, replace)
     seeded.add(resource)
-    return
+    return { resource, mode: "file" as const, count: fileStore.count(resource) }
   }
 
   try {
-    const { connectToDatabase } = await import("@/lib/mongoose")
-    const {
-      Service,
-      Portfolio,
-      BlogPost,
-      Testimonial,
-      TeamMember,
-    } = await import("@/lib/models")
-
-    const ModelMap = {
-      services: Service,
-      portfolio: Portfolio,
-      blog: BlogPost,
-      testimonials: Testimonial,
-      team: TeamMember,
-    } as const
-
-    await connectToDatabase()
+    const ModelMap = await getModelMap()
     const Model = ModelMap[resource]
-    const count = await Model.countDocuments()
-    if (count === 0) {
+
+    if (replace) {
+      await Model.deleteMany({})
       await Model.insertMany(defaults)
-      console.log(`[seed] Seeded ${defaults.length} ${resource} into MongoDB`)
+      console.log(`[seed] Replaced Mongo ${resource} with ${defaults.length} items`)
+      seeded.add(resource)
+      return { resource, mode: "mongo" as const, count: defaults.length }
     }
+
+    const existing = await Model.find().lean()
+
+    // Incomplete catalog (classic deploy bug: 2 projects / 3 services) → full replace
+    if (existing.length < defaults.length) {
+      await Model.deleteMany({})
+      await Model.insertMany(defaults)
+      console.log(
+        `[seed] Upgraded Mongo ${resource}: ${existing.length} → ${defaults.length}`
+      )
+      seeded.add(resource)
+      return { resource, mode: "mongo" as const, count: defaults.length }
+    }
+
     seeded.add(resource)
+    return { resource, mode: "mongo" as const, count: existing.length }
   } catch (error) {
     console.error(
-      `[seed] Mongo unavailable for ${resource}, seeding file fallback:`,
+      `[seed] Mongo unavailable for ${resource}, using file fallback:`,
       error
     )
-    seedIntoFile(resource)
+    seedIntoFile(resource, replace)
     seeded.add(resource)
+    return { resource, mode: "file" as const, count: fileStore.count(resource) }
+  }
+}
+
+/**
+ * Ensure defaults exist. Safe on every request.
+ * Completes partial deploys (e.g. only 2 projects / 3 services from old seed).
+ * Does NOT skip when the in-memory flag is set but the DB is still incomplete.
+ */
+export async function ensureResourceSeeded(resource: Resource) {
+  if (seeded.has(resource)) return
+  const result = await syncResourceDefaults(resource, { replace: false })
+  // Only mark done when the collection is actually full
+  if (result.count >= DEFAULTS[resource].length) {
+    seeded.add(resource)
+  } else {
+    seeded.delete(resource)
   }
 }
 
@@ -538,6 +608,16 @@ export async function ensureAllSeeded() {
   for (const key of Object.keys(DEFAULTS) as Resource[]) {
     await ensureResourceSeeded(key)
   }
+}
+
+/** Full sync — makes deployed content match local default lists. */
+export async function syncAllDefaults(opts?: { replace?: boolean }) {
+  resetSeedFlags()
+  const results = []
+  for (const key of Object.keys(DEFAULTS) as Resource[]) {
+    results.push(await syncResourceDefaults(key, opts))
+  }
+  return results
 }
 
 /** Force re-check (e.g. after deploy) — clears in-memory "already seeded" flags. */

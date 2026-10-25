@@ -63,9 +63,12 @@ export default function DashboardPage() {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
     try {
-      // Sync empty DB with site defaults (needed after deploy so admin matches public pages)
+      // Sync full catalog on deploy (fixes old Atlas seed with only 2 projects / 3 services)
       if (isRefresh || !didSeed.current) {
-        await adminFetch("/api/admin/seed", { method: "POST" }).catch(() => null);
+        await adminFetch("/api/admin/seed", {
+          method: "POST",
+          body: JSON.stringify({ replace: false }),
+        }).catch(() => null);
         didSeed.current = true;
       }
 
@@ -142,17 +145,32 @@ export default function DashboardPage() {
             Overview of your website content and activity
           </p>
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="gap-2 flex-shrink-0 h-9"
-          disabled={refreshing}
-          onClick={() => load(true)}
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
-          <span className="hidden sm:inline">Refresh</span>
-        </Button>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="gap-2 h-9"
+            disabled={refreshing}
+            onClick={async () => {
+              setRefreshing(true);
+              try {
+                await adminFetch("/api/admin/seed", {
+                  method: "POST",
+                  body: JSON.stringify({ replace: true }),
+                });
+                didSeed.current = false;
+                await load(true);
+              } catch {
+                setRefreshing(false);
+              }
+            }}
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
+            <span className="hidden md:inline">Sync full catalog</span>
+            <span className="md:hidden">Sync</span>
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4">
