@@ -127,11 +127,11 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-0.5">
             Overview of your website content and activity
           </p>
         </div>
@@ -139,43 +139,45 @@ export default function DashboardPage() {
           type="button"
           variant="outline"
           size="sm"
-          className="gap-2"
+          className="gap-2 flex-shrink-0 h-9"
           disabled={refreshing}
           onClick={() => load(true)}
         >
           <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
-          Refresh
+          <span className="hidden sm:inline">Refresh</span>
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {STAT_CARDS(s).map((card, i) => (
           <motion.div
             key={card.label}
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.06 }}
+            transition={{ delay: i * 0.04 }}
           >
             <Link href={card.href}>
-              <Card className="hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 cursor-pointer border-gray-200 dark:border-slate-800">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${card.color} flex items-center justify-center shadow-sm`}>
-                      <card.icon className="w-4.5 h-4.5 text-white" />
+              <Card className="hover:shadow-md transition-all duration-200 active:scale-[0.98] cursor-pointer border-gray-200 dark:border-slate-800 h-full">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between mb-2 sm:mb-3">
+                    <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br ${card.color} flex items-center justify-center shadow-sm`}>
+                      <card.icon className="w-4 h-4 text-white" />
                     </div>
                     {card.badge && (
                       <Badge
                         variant="secondary"
-                        className="text-[10px] bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 px-1.5"
+                        className="text-[9px] sm:text-[10px] bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 px-1.5 max-w-[4.5rem] truncate"
                       >
                         {card.badge}
                       </Badge>
                     )}
                   </div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                     {card.value.toLocaleString()}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{card.label}</p>
+                  <p className="text-[11px] sm:text-xs text-gray-500 dark:text-slate-400 mt-0.5 truncate">
+                    {card.label}
+                  </p>
                 </CardContent>
               </Card>
             </Link>
@@ -183,7 +185,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card className="border-gray-200 dark:border-slate-800">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">

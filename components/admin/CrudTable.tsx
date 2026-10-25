@@ -69,33 +69,38 @@ export function CrudTable<T extends { [key: string]: any }>({
     }
   };
 
+  const primaryCol = columns[0];
+  const secondaryCols = columns.slice(1, 3);
+
   return (
     <>
       <div className="space-y-4">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h1>
-            {subtitle && <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">{subtitle}</p>}
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white truncate">{title}</h1>
+            {subtitle && (
+              <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">{subtitle}</p>
+            )}
           </div>
-          <Button onClick={onAdd} className="gap-2 bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-500/30">
+          <Button
+            onClick={onAdd}
+            className="gap-2 bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-500/30 w-full sm:w-auto h-10"
+          >
             <Plus className="w-4 h-4" /> {addLabel}
           </Button>
         </div>
 
-        {/* Search */}
-        <div className="relative max-w-xs">
+        <div className="relative w-full sm:max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
             placeholder={searchPlaceholder}
             value={searchVal}
             onChange={(e) => handleSearch(e.target.value)}
-            className="pl-9 h-9 text-sm"
+            className="pl-9 h-10 text-sm"
           />
         </div>
 
-        {/* Table */}
-        <Card className="border-gray-200 dark:border-slate-800">
+        <Card className="border-gray-200 dark:border-slate-800 overflow-hidden">
           <CardContent className="p-0">
             {loading ? (
               <div className="flex items-center justify-center py-16">
@@ -106,56 +111,138 @@ export function CrudTable<T extends { [key: string]: any }>({
                 <p className="text-sm text-gray-500 dark:text-slate-400">No records found</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-200 dark:border-slate-800">
-                      {columns.map((col) => (
-                        <th key={String(col.key)} className={`px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider ${col.className ?? ""}`}>
-                          {col.label}
-                        </th>
-                      ))}
-                      <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
-                    {data.map((row, i) => (
-                      <tr key={row[idKey] ?? i} className="hover:bg-gray-50 dark:hover:bg-slate-800/40 transition-colors">
-                        {columns.map((col) => (
-                          <td key={String(col.key)} className={`px-4 py-3 ${col.className ?? ""}`}>
-                            {col.render ? col.render(row) : String(row[col.key as string] ?? "—")}
-                          </td>
-                        ))}
-                        <td className="px-4 py-3">
-                          <div className="flex items-center justify-end gap-1.5">
-                            {extraActions?.(row)}
-                            <Button size="sm" variant="ghost" onClick={() => onEdit(row)} className="h-7 w-7 p-0 hover:bg-blue-50 dark:hover:bg-blue-900/20">
-                              <Edit2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                            </Button>
-                            <Button size="sm" variant="ghost" onClick={() => setDeletingId(row[idKey])} className="h-7 w-7 p-0 hover:bg-red-50 dark:hover:bg-red-900/20">
-                              <Trash2 className="w-3.5 h-3.5 text-red-500" />
-                            </Button>
+              <>
+                {/* Mobile card list */}
+                <div className="md:hidden divide-y divide-gray-100 dark:divide-slate-800">
+                  {data.map((row, i) => (
+                    <div key={row[idKey] ?? i} className="p-4 space-y-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="font-semibold text-gray-900 dark:text-white text-sm">
+                            {primaryCol.render
+                              ? primaryCol.render(row)
+                              : String(row[primaryCol.key as string] ?? "—")}
                           </div>
-                        </td>
+                          <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500 dark:text-slate-400">
+                            {secondaryCols.map((col) => (
+                              <span key={String(col.key)} className="inline-flex items-center gap-1">
+                                <span className="opacity-60">{col.label}:</span>
+                                {col.render
+                                  ? col.render(row)
+                                  : String(row[col.key as string] ?? "—")}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          {extraActions?.(row)}
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => onEdit(row)}
+                            className="h-9 w-9 p-0 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                          >
+                            <Edit2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setDeletingId(row[idKey])}
+                            className="h-9 w-9 p-0 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop table */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-slate-800">
+                        {columns.map((col) => (
+                          <th
+                            key={String(col.key)}
+                            className={`px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider ${col.className ?? ""}`}
+                          >
+                            {col.label}
+                          </th>
+                        ))}
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                          Actions
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
+                      {data.map((row, i) => (
+                        <tr
+                          key={row[idKey] ?? i}
+                          className="hover:bg-gray-50 dark:hover:bg-slate-800/40 transition-colors"
+                        >
+                          {columns.map((col) => (
+                            <td key={String(col.key)} className={`px-4 py-3 ${col.className ?? ""}`}>
+                              {col.render
+                                ? col.render(row)
+                                : String(row[col.key as string] ?? "—")}
+                            </td>
+                          ))}
+                          <td className="px-4 py-3">
+                            <div className="flex items-center justify-end gap-1.5">
+                              {extraActions?.(row)}
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => onEdit(row)}
+                                className="h-7 w-7 p-0 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                              >
+                                <Edit2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setDeletingId(row[idKey])}
+                                className="h-7 w-7 p-0 hover:bg-red-50 dark:hover:bg-red-900/20"
+                              >
+                                <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>
 
-        {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between text-sm text-gray-500 dark:text-slate-400">
-            <span>{total} total records</span>
+          <div className="flex items-center justify-between text-sm text-gray-500 dark:text-slate-400 gap-2">
+            <span className="text-xs sm:text-sm">{total} total</span>
             <div className="flex items-center gap-1.5">
-              <Button variant="outline" size="sm" className="h-7 w-7 p-0" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 w-8 p-0"
+                disabled={page <= 1}
+                onClick={() => onPageChange(page - 1)}
+              >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </Button>
-              <span className="text-xs font-medium px-2">Page {page} of {totalPages}</span>
-              <Button variant="outline" size="sm" className="h-7 w-7 p-0" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)}>
+              <span className="text-xs font-medium px-2">
+                {page}/{totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 w-8 p-0"
+                disabled={page >= totalPages}
+                onClick={() => onPageChange(page + 1)}
+              >
                 <ChevronRight className="w-3.5 h-3.5" />
               </Button>
             </div>
@@ -163,16 +250,19 @@ export function CrudTable<T extends { [key: string]: any }>({
         )}
       </div>
 
-      {/* Delete confirm */}
       <AlertDialog open={!!deletingId} onOpenChange={(o) => !o && setDeletingId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this record?</AlertDialogTitle>
             <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} disabled={deleteLoading} className="bg-red-600 hover:bg-red-700">
+          <AlertDialogFooter className="flex-col-reverse sm:flex-row gap-2">
+            <AlertDialogCancel className="mt-0">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              disabled={deleteLoading}
+              className="bg-red-600 hover:bg-red-700"
+            >
               {deleteLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -182,13 +272,23 @@ export function CrudTable<T extends { [key: string]: any }>({
   );
 }
 
-// ── Status badge helper ────────────────────────────────────────────────────────
-export function StatusBadge({ active, trueLabel = "Active", falseLabel = "Inactive" }: { active: boolean; trueLabel?: string; falseLabel?: string }) {
+export function StatusBadge({
+  active,
+  trueLabel = "Active",
+  falseLabel = "Inactive",
+}: {
+  active: boolean;
+  trueLabel?: string;
+  falseLabel?: string;
+}) {
   return (
-    <Badge className={active
-      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px]"
-      : "bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-400 text-[10px]"
-    }>
+    <Badge
+      className={
+        active
+          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px]"
+          : "bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-400 text-[10px]"
+      }
+    >
       {active ? trueLabel : falseLabel}
     </Badge>
   );
